@@ -31,7 +31,7 @@ function Main() {
                         Adicionar Projeto
                     </Button>
                     <Block_andamento>
-                        {listProjetos.data.map((e) => (
+                        {listProjetos.data?.map((e) => (
                             <CardIndex titulo={e.nome}/>
                         ))}
                     </Block_andamento>

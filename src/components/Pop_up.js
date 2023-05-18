@@ -12,6 +12,7 @@ export const Pop_up = (props) => {
     const [error, setError] = useState();
 
     const { user } = UserAuth();
+
     const onSubmit = () => {
         if(form === ""){
             setHasError(true);
@@ -26,7 +27,10 @@ export const Pop_up = (props) => {
                 setTrigger(false);
             })
         }
+        setForm("");
     }
+
+    console.log(form);
 
     return(
         <>
