@@ -40,7 +40,11 @@ function Login(){
                 localStorage.setItem("user", JSON.stringify(res.data));
                 navigate("/index");
 
-            })  
+            }) 
+            .catch(function (error) {
+                // manipula erros da requisição
+                console.error(error);
+            }) 
         }
         
     }

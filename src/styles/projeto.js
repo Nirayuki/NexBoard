@@ -7,7 +7,7 @@ export const Container = styled.div`
     flex-direction: column;
     align-items: flex-start;
 
-    padding: 100px;
+    padding: 50px;
     gap: 10px;
 
     
@@ -112,12 +112,11 @@ export const Section_Cards = styled.section`
     align-items: flex-start;
     padding: 10px;
     gap: 10px;
+    overflow-x: auto;
 
 `
 
-export const Card = styled.div`
-    width: 363px;
-    
+export const Card = styled.div`    
     display: flex;
     flex-direction: column;
     padding: 3px 15px 15px 15px;
@@ -130,7 +129,7 @@ export const Card = styled.div`
     color: white;
 
     .line{
-        width: 333px;
+        width: 100%;
         height: 0px;
 
         border: 2px solid rgba(255, 255, 255, 0.5);
@@ -138,8 +137,8 @@ export const Card = styled.div`
 `
 
 export const Block_Tarefa = styled.div`
+    width: 353px;
     display: flex;
-    width: 100%;
     flex-direction: column;
     gap: 10px;
 `
@@ -154,6 +153,46 @@ export const Block_Add = styled.div`
     img{
         width: 30px;
         height: 30px;
+    }
+
+    &&:hover{
+        opacity: 0.8;
+    }
+`
+
+export const Card_Tarefa = styled.div`
+    width: 333px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    padding: 0px 10px 10px 10px;
+    gap: 10px;
+
+    background: #147EFB;
+    border-radius: 5px;
+
+    cursor: pointer;
+
+    .icons{
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    div{
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    span{
+        font-size: 15px;
+    }
+
+    img{
+        width: 23px;
+        height: 23px;
     }
 
     &&:hover{

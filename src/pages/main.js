@@ -19,6 +19,10 @@ function Main() {
         .then((res) => {
             setListProjetos(res);
         })
+        .catch(function (error) {
+            // manipula erros da requisição
+            console.error(error);
+        })
         
     }, [listProjetos])
     return (
@@ -32,7 +36,7 @@ function Main() {
                     </Button>
                     <Block_andamento>
                         {listProjetos.data?.map((e) => (
-                            <CardIndex titulo={e.nome}/>
+                            <CardIndex data={e} titulo={e.nome}/>
                         ))}
                     </Block_andamento>
                 </Section>

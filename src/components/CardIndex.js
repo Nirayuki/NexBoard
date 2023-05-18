@@ -2,12 +2,12 @@ import React from "react";
 import { Card, Block, Icons } from "../styles/CardIndex";
 import github from '../Assets/Octicons-mark-github.svg';
 import link from '../Assets/link.svg';
+import { Link } from "react-router-dom";
 
 export const CardIndex = (props) => {
-
     return(
         <Card>
-            <div className="div_link" onClick={() => console.log("clicou div")}></div>
+            <Link className="div_link" to={`/projeto?id=${props.data.idprojeto}`}></Link>
             <p className="titulo">{props.titulo}</p>
             <Block>
                 <span>80%</span>

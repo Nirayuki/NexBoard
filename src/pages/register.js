@@ -59,6 +59,10 @@ function Register(){
             .then((res) => {
                 console.log(res);
             })
+            .catch(function (error) {
+                // manipula erros da requisição
+                console.error(error);
+            })
         }
     }
 

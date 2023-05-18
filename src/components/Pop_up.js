@@ -26,6 +26,10 @@ export const Pop_up = (props) => {
             .then((res) => {
                 setTrigger(false);
             })
+            .catch(function (error) {
+                // manipula erros da requisição
+                console.error(error);
+            })
         }
         setForm("");
     }

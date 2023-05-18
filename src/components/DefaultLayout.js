@@ -9,7 +9,7 @@ export const DefaultLayout = ({ children }) => {
         <>
             <Header>
                 <div className="navigation">
-                    <Link>Inicio</Link>
+                    <Link to="/index">Inicio</Link>
                     <Link>Projetos</Link>
                 </div>
                 <div className="config">
