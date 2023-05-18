@@ -11,7 +11,9 @@ export const AuthContextProvider = ({children}) => {
         const userData = localStorage.getItem("user");
         
         if(userData){
-            setUser(userData);
+            setUser(JSON.parse(userData));
+        }else{
+            setUser("");
         }
 
     }, [])
