@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Container, Card, Block, Block_Input, Icons, Button, Block_Button, Error} from '../styles/login';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 
 import persona from '../Assets/person.svg';
@@ -17,6 +17,7 @@ function Login(){
     const [form, setForm] = useState(initialValues);
     const [errors, setErrors] = useState("");
     const [hasError, setHasError] = useState(false);
+    const navigate = useNavigate();
 
     const handleChange = (ev) => {
         const { name, value } = ev.target
@@ -36,9 +37,12 @@ function Login(){
                 senha: form.senha
             })
             .then((res) => {
-                console.log(res);
-            })
+                localStorage.setItem("user", JSON.stringify(res.data));
+                navigate("/index");
+
+            })  
         }
+        
     }
 
     return(
