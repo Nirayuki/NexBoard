@@ -90,7 +90,7 @@ export const Icons = styled.div`
         transform: rotate(90deg);
     }
 
-    .mail, .lock{
+    .mail, .lock, .badge{
         width: 29px;
         height: 24px;
     }
@@ -137,7 +137,6 @@ export const Button = styled.button`
         opacity: 0.7;
     }
 `
-
 export const Error = styled.div`
     max-width: 585px;
     width: 100%;
