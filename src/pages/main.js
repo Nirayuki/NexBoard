@@ -27,7 +27,7 @@ function Main() {
     }, [listProjetos])
     return (
         <DefaultLayout>
-            <Pop_up trigger={trigger} setTrigger={setTrigger}/>
+            <Pop_up trigger={trigger} setTrigger={setTrigger} type="projeto"/>
             <Container>
                 <Section>
                     <Button onClick={() => setTrigger(true)}>

@@ -10,33 +10,50 @@ import add from '../Assets/add.svg';
 import schedule from '../Assets/schedule.svg';
 import check from '../Assets/check_box_outline.svg';
 import axios from "axios";
+import { Pop_up } from "../components/Pop_up";
 
 
 function Projeto() {
 
+    const [trigger, setTrigger] = useState(false);
     const [dataProjeto, setDataProjeto] = useState();
-    
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const idprojeto = urlParams.get("id");
+    const [tarefa, setTarefa] = useState();
+    const [andamento, setAndamento] = useState();
+    const [concluido, setConcluido] = useState();
+    const [type, setType] = useState();
+    const [type_tarefa, setType_Tarefa] = useState();
+    const urlParams = new URLSearchParams(window.location.search);
+    const idprojeto = urlParams.get("id");
 
+    useEffect(() => {
         axios.post('http://localhost:8080/projeto/getone', {
             idprojeto: idprojeto
         })
-        .then((res) => {
-            console.log(res);
-            setDataProjeto(res.data);
-        })
-        .catch(function (error) {
-            // manipula erros da requisição
-            console.error(error);
-        })
-    }, [])
+            .then((res) => {
+                setDataProjeto(res.data);
+            })
+            .catch(function (error) {
+                // manipula erros da requisição
+                console.error(error);
+            })
 
-    console.log(dataProjeto);
+        axios.post('http://localhost:8080/projeto/getonetarefa', {
+            idprojeto: idprojeto
+        })
+            .then((res) => {
+                setTarefa(res.data.tarefa);
+                setAndamento(res.data.andamento);
+                setConcluido(res.data.concluido);
+            })
+            .catch(function (error) {
+                // manipula erros da requisição
+                console.error(error);
+            })
+    }, [tarefa, andamento, concluido])
 
     return (
         <DefaultLayout>
+            <Pop_up trigger={trigger} setTrigger={setTrigger} type={type} idprojeto={idprojeto} type_tarefa={type_tarefa}/>
             <Container>
                 <Section_Buttons>
                     <div className="container_button_status">
@@ -44,11 +61,11 @@ function Projeto() {
                             <img src={done} />
                             Concluído
                         </button>
-                        :
-                        <button className="andamento">
-                            <img src={undo} />
-                            Em andamento
-                        </button>}
+                            :
+                            <button className="andamento">
+                                <img src={undo} />
+                                Em andamento
+                            </button>}
                     </div>
                     <button className="delete">
                         <img src={del} />
@@ -67,21 +84,31 @@ function Projeto() {
                         <p className="titulo">Tarefas</p>
                         <div className="line"></div>
                         <Block_Tarefa>
-                            <Card_Tarefa>
-                                <p>Fazer protótipo</p>
-                                <div className="icons">
-                                    <div>
-                                        <img src={schedule} />
-                                        <span>12 de Mai</span>
+                            {tarefa?.map((e) => (
+                                <Card_Tarefa onClick={() => {
+                                    setTrigger(true);
+                                    setType("view_tarefa");
+                                    setType_Tarefa("Tarefa");
+                                }}>
+                                    <p>{e.nome}</p>
+                                    <div className="icons">
+                                        <div>
+                                            <img src={schedule} />
+                                            <span>12 de Mai</span>
+                                        </div>
+                                        <div>
+                                            <img src={check} />
+                                            <span>0/5</span>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <img src={check} />
-                                        <span>0/5</span>
-                                    </div>
-                                </div>
-                            </Card_Tarefa>
+                                </Card_Tarefa>
+                            ))}
                         </Block_Tarefa>
-                        <Block_Add>
+                        <Block_Add onClick={() => {
+                            setTrigger(true);
+                            setType("add_tarefa");
+                            setType_Tarefa("Tarefa");
+                        }}>
                             <img src={add} />
                             <p>Adicionar Tarefa</p>
                         </Block_Add>
@@ -90,8 +117,30 @@ function Projeto() {
                         <p className="titulo">Em andamento</p>
                         <div className="line"></div>
                         <Block_Tarefa>
+                        {andamento?.map((e) => (
+                                <Card_Tarefa onClick={() => {
+                                    setTrigger(true);
+                                    setType("view_tarefa");
+                                }}>
+                                    <p>{e.nome}</p>
+                                    <div className="icons">
+                                        <div>
+                                            <img src={schedule} />
+                                            <span>12 de Mai</span>
+                                        </div>
+                                        <div>
+                                            <img src={check} />
+                                            <span>0/5</span>
+                                        </div>
+                                    </div>
+                                </Card_Tarefa>
+                            ))}
                         </Block_Tarefa>
-                        <Block_Add>
+                        <Block_Add onClick={() => {
+                            setTrigger(true);
+                            setType("add_tarefa");
+                            setType_Tarefa("Em andamento");
+                        }}>
                             <img src={add} />
                             <p>Adicionar Tarefa</p>
                         </Block_Add>
@@ -100,8 +149,31 @@ function Projeto() {
                         <p className="titulo">Concluído</p>
                         <div className="line"></div>
                         <Block_Tarefa>
+                        {concluido?.map((e) => (
+                                <Card_Tarefa onClick={() => {
+                                    setTrigger(true);
+                                    setType("view_tarefa");
+                                    setType_Tarefa("Concluido");
+                                }}>
+                                    <p>{e.nome}</p>
+                                    <div className="icons">
+                                        <div>
+                                            <img src={schedule} />
+                                            <span>12 de Mai</span>
+                                        </div>
+                                        <div>
+                                            <img src={check} />
+                                            <span>0/5</span>
+                                        </div>
+                                    </div>
+                                </Card_Tarefa>
+                            ))}
                         </Block_Tarefa>
-                        <Block_Add>
+                        <Block_Add onClick={() => {
+                            setTrigger(true);
+                            setType("add_tarefa");
+                            setType_Tarefa("Concluido");
+                        }}>
                             <img src={add} />
                             <p>Adicionar Tarefa</p>
                         </Block_Add>

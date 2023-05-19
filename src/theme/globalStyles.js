@@ -6,6 +6,23 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     background: #1C1C1C;
     font-family: Open-Sans, Helvetica, Sans-Serif;
+     
+    &::-webkit-scrollbar{
+        border: none;
+        width: 10px;
+        height: 0.1rem;
+        border-radius: 5px;
+
+    }
+
+    &::-webkit-scrollbar-thumb{
+        background-color: #5b5b5b;
+        border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-track{
+        height: 2px;
+    }
   }
 `;
  
