@@ -13,18 +13,24 @@ function Main() {
     const { user } = UserAuth();
 
     useEffect(() => {
-        axios.post('http://localhost:8080/projeto/list', {
-            iduser: user.iduser
-        })
-        .then((res) => {
-            setListProjetos(res);
-        })
-        .catch(function (error) {
-            // manipula erros da requisição
-            console.error(error);
-        })
-        
-    }, [listProjetos])
+        if(user){
+           try{
+            axios.post('http://localhost:8080/projeto/list', {
+                iduser: user?.iduser
+                })
+                .then((res) => {
+                    setListProjetos(res);
+                })
+                .catch(function (error) {
+                    // manipula erros da requisição
+                    console.error(error);
+                })
+           }catch(error){
+            console.log(error);
+           }
+        }
+    }, [listProjetos, user])
+    
     return (
         <DefaultLayout>
             <Pop_up trigger={trigger} setTrigger={setTrigger} type="projeto"/>
@@ -36,12 +42,21 @@ function Main() {
                     </Button>
                     <Block_andamento>
                         {listProjetos.data?.map((e) => (
-                            <CardIndex data={e} titulo={e.nome}/>
+                            <>
+                                {e.status === "Em andamento" ? <CardIndex data={e} titulo={e.nome}/> : ""}
+                            </>
                         ))}
                     </Block_andamento>
                 </Section>
                 <Section>
-                    Concluido
+                    <p className="titulo_concluido">Concluido</p>
+                    <Block_andamento>
+                        {listProjetos.data?.map((e) => (
+                                <>
+                                    {e.status === "Concluido" ? <CardIndex data={e} titulo={e.nome}/> : ""}
+                                </>
+                        ))}
+                    </Block_andamento>
                 </Section>
             </Container>
         </DefaultLayout>

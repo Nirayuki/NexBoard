@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Container, Card, Block, Block_Input, Icons, Button, Error} from '../styles/register';
 import {Link} from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 import persona from '../Assets/person.svg';
 import mail from '../Assets/mail.svg';
@@ -25,6 +26,8 @@ function Register(){
     const [form, setForm] = useState(initialValues);
     const [errors, setErrors] = useState(initialErros);
     const [hasError, setHasError] = useState(false);
+
+    const navigate = useNavigate();
 
     const handleChange = (ev) => {
         const { name, value } = ev.target
@@ -57,7 +60,8 @@ function Register(){
                 senha: form.senha
             })
             .then((res) => {
-                console.log(res);
+                localStorage.setItem("user", res);
+                window.location.reload();
             })
             .catch(function (error) {
                 // manipula erros da requisição

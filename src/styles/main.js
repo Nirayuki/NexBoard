@@ -17,6 +17,12 @@ export const Section = styled.section`
     padding: 10px 0px;
     gap: 30px;
 
+
+    .titulo_concluido{
+        font-size: 28px;
+        color: white;
+    }
+
 `
 
 export const Button = styled.button`

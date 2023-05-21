@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DefaultLayout } from "../components/DefaultLayout";
 import { Container, Section_Buttons, Section_Titulo, Icons, Section_Cards, Card, Block_Tarefa, Block_Add, Card_Tarefa } from "../styles/projeto";
+
 import done from '../Assets/done.svg';
 import undo from '../Assets/undo.svg';
 import del from '../Assets/delete.svg';
@@ -9,8 +10,15 @@ import link from '../Assets/link.svg';
 import add from '../Assets/add.svg';
 import schedule from '../Assets/schedule.svg';
 import check from '../Assets/check_box_outline.svg';
+import checkdone from '../Assets/check_box.svg';
+import settings from '../Assets/settings.svg';
+
 import axios from "axios";
 import { Pop_up } from "../components/Pop_up";
+
+import 'dayjs/locale/pt-br';
+import dayjs from "dayjs";
+
 
 
 function Projeto() {
@@ -22,6 +30,7 @@ function Projeto() {
     const [concluido, setConcluido] = useState();
     const [type, setType] = useState();
     const [type_tarefa, setType_Tarefa] = useState();
+    const [idTarefa, setIdTarefa] = useState();
     const urlParams = new URLSearchParams(window.location.search);
     const idprojeto = urlParams.get("id");
 
@@ -51,18 +60,64 @@ function Projeto() {
             })
     }, [tarefa, andamento, concluido])
 
+    const setStatus = (status) => {
+        try {
+            axios.post('http://localhost:8080/projeto/projetoChangeStatus', {
+                status: status,
+                idprojeto: idprojeto
+            })
+                .then((res) => {
+                    console.log(res);
+                })
+                .catch(function (error) {
+                    // manipula erros da requisição
+                    console.error(error);
+                })
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+
+    const handleOnDrag = (event, data) => {
+        event.dataTransfer.setData("cardData", data.idtarefa);
+    }
+
+    const handleOnDragOver = (e) => {
+        e.preventDefault();
+    }
+
+    const handleOnDrop = (e, type_card) => {
+        const dataTransfering = e.dataTransfer.getData("cardData");
+        try {
+            axios.post('http://localhost:8080/tarefa/tarefaChangeStatus', {
+                status: type_card,
+                idtarefa: dataTransfering
+            })
+                .then((res) => {
+                    console.log(res);
+                })
+                .catch(function (error) {
+                    // manipula erros da requisição
+                    console.error(error);
+                })
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     return (
         <DefaultLayout>
-            <Pop_up trigger={trigger} setTrigger={setTrigger} type={type} idprojeto={idprojeto} type_tarefa={type_tarefa}/>
+            <Pop_up trigger={trigger} setTrigger={setTrigger} type={type} dataProjeto={dataProjeto} idprojeto={idprojeto} type_tarefa={type_tarefa} idtarefa={idTarefa} />
             <Container>
                 <Section_Buttons>
                     <div className="container_button_status">
-                        {dataProjeto?.status === "Em andamento" ? <button className="concluido">
+                        {dataProjeto?.status === "Em andamento" ? <button onClick={() => setStatus("Concluido")} className="concluido">
                             <img src={done} />
                             Concluído
                         </button>
                             :
-                            <button className="andamento">
+                            <button onClick={() => setStatus("Em andamento")} className="andamento">
                                 <img src={undo} />
                                 Em andamento
                             </button>}
@@ -77,10 +132,17 @@ function Projeto() {
                     <Icons>
                         <img src={github} onClick={() => console.log("Clicou imagem")} />
                         <img src={link} onClick={() => console.log("Clicou imagem")} />
+                        <svg onClick={() => {
+                            setTrigger(true);
+                            setType("edit_projeto");
+                        }} xmlns="http://www.w3.org/2000/svg" fill="white" style={{opacity: "0.8"}} height="48" viewBox="0 96 960 960" width="48"><path d="M382.739 981.978 362.5 854.065q-17.565-6.282-37.489-17.684-19.924-11.403-34.728-23.446l-119.674 54.956-98.5-173.804 109.434-79.957q-1.761-8.282-2.261-19.065-.5-10.782-.5-19.065 0-8.283.5-19.065.5-10.783 2.261-19.065L72.109 457.674l98.5-173.326 120.152 54.717q14.565-11.804 34.369-23.087 19.805-11.282 37.37-16.804l20.239-129.392h194.522L597.5 298.174q17.565 6.522 37.87 17.304 20.304 10.783 34.347 23.587l119.913-54.717 98.261 173.326-109.673 78.196q1.76 9.282 2.38 20.065.62 10.782.62 20.065 0 9.283-.62 19.565-.62 10.283-2.38 19.565l109.673 78.957-98.5 173.804-119.913-54.956q-14.804 12.043-34.108 23.826-19.305 11.783-37.87 17.304l-20.239 127.913H382.739ZM479.522 706q54 0 92-38t38-92q0-54-38-92t-92-38q-54 0-92 38t-38 92q0 54 38 92t92 38Z"/></svg>
                     </Icons>
                 </Section_Titulo>
                 <Section_Cards>
-                    <Card>
+                    <Card
+                        onDrop={(e) => handleOnDrop(e, "Tarefa")}
+                        onDragOver={(e) => handleOnDragOver(e)}
+                    >
                         <p className="titulo">Tarefas</p>
                         <div className="line"></div>
                         <Block_Tarefa>
@@ -88,17 +150,20 @@ function Projeto() {
                                 <Card_Tarefa onClick={() => {
                                     setTrigger(true);
                                     setType("view_tarefa");
-                                    setType_Tarefa("Tarefa");
-                                }}>
+                                    setIdTarefa(e.idtarefa);
+                                }}
+                                    draggable
+                                    onDragStart={(event) => handleOnDrag(event, e)}
+                                >
                                     <p>{e.nome}</p>
                                     <div className="icons">
                                         <div>
                                             <img src={schedule} />
-                                            <span>12 de Mai</span>
+                                            <span>{dayjs(e.data).format('DD MMM')}</span>
                                         </div>
                                         <div>
-                                            <img src={check} />
-                                            <span>0/5</span>
+                                            {e.checklist_done === e.checklist_size ? <img src={checkdone} /> : <img src={check} />}
+                                            <span>{`${e.checklist_done}/${e.checklist_size}`}</span>
                                         </div>
                                     </div>
                                 </Card_Tarefa>
@@ -113,24 +178,33 @@ function Projeto() {
                             <p>Adicionar Tarefa</p>
                         </Block_Add>
                     </Card>
-                    <Card>
+                    <Card
+                        onDrop={(e) => handleOnDrop(e, "Em andamento")}
+                        onDragOver={(e) => handleOnDragOver(e)}
+                    >
                         <p className="titulo">Em andamento</p>
                         <div className="line"></div>
-                        <Block_Tarefa>
-                        {andamento?.map((e) => (
+                        <Block_Tarefa
+
+                        >
+                            {andamento?.map((e) => (
                                 <Card_Tarefa onClick={() => {
                                     setTrigger(true);
                                     setType("view_tarefa");
-                                }}>
+                                    setIdTarefa(e.idtarefa);
+                                }}
+                                    draggable
+                                    onDragStart={(event) => handleOnDrag(event, e)}
+                                >
                                     <p>{e.nome}</p>
                                     <div className="icons">
                                         <div>
                                             <img src={schedule} />
-                                            <span>12 de Mai</span>
+                                            <span>{dayjs(e.data).format('DD MMM')}</span>
                                         </div>
                                         <div>
-                                            <img src={check} />
-                                            <span>0/5</span>
+                                            {e.checklist_done === e.checklist_size ? <img src={checkdone} /> : <img src={check} />}
+                                            <span>{`${e.checklist_done}/${e.checklist_size}`}</span>
                                         </div>
                                     </div>
                                 </Card_Tarefa>
@@ -145,25 +219,31 @@ function Projeto() {
                             <p>Adicionar Tarefa</p>
                         </Block_Add>
                     </Card>
-                    <Card>
+                    <Card
+                        onDrop={(e) => handleOnDrop(e, "Concluido")}
+                        onDragOver={(e) => handleOnDragOver(e)}
+                    >
                         <p className="titulo">Concluído</p>
                         <div className="line"></div>
                         <Block_Tarefa>
-                        {concluido?.map((e) => (
+                            {concluido?.map((e) => (
                                 <Card_Tarefa onClick={() => {
                                     setTrigger(true);
                                     setType("view_tarefa");
-                                    setType_Tarefa("Concluido");
-                                }}>
+                                    setIdTarefa(e.idtarefa);
+                                }}
+                                    draggable
+                                    onDragStart={(event) => handleOnDrag(event, e)}
+                                >
                                     <p>{e.nome}</p>
                                     <div className="icons">
                                         <div>
                                             <img src={schedule} />
-                                            <span>12 de Mai</span>
+                                            <span>{dayjs(e.data).format('DD MMM')}</span>
                                         </div>
                                         <div>
-                                            <img src={check} />
-                                            <span>0/5</span>
+                                            {e.checklist_done === e.checklist_size ? <img src={checkdone} /> : <img src={check} />}
+                                            <span>{`${e.checklist_done}/${e.checklist_size}`}</span>
                                         </div>
                                     </div>
                                 </Card_Tarefa>

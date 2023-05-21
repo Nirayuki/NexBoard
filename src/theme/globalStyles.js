@@ -6,6 +6,14 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     background: #1C1C1C;
     font-family: Open-Sans, Helvetica, Sans-Serif;
+
+    input:focus{
+      outline: none;
+    }
+
+    textarea:focus{
+      outline: none;
+    }
      
     &::-webkit-scrollbar{
         border: none;

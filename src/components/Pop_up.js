@@ -1,25 +1,77 @@
-import React, { useState, useRef } from "react";
-import { Container, Card, Button, Error, Card_Add, Block_Form } from "../styles/Pop_up";
+import React, { useState, useRef, useEffect } from "react";
+import { 
+    Container, Card, Button, Error, Card_Add, Block_Form, Block_ViewTarefa, Card_Tarefa, 
+    Checklist_View, Block_Coment, ContainerObservacao, Block_Settings } from "../styles/Pop_up";
+
 import close from '../Assets/close.svg';
 import schedule from '../Assets/schedule.svg';
 import add from '../Assets/add.svg';
 import del from '../Assets/delete.svg';
+import check from '../Assets/check_box_outline.svg';
+import checkdone from '../Assets/check_box.svg';
+import account from '../Assets/account_circle.svg'
+
 import axios from "axios";
 import { UserAuth } from "../context/authcontext";
 import ScrollableFeed from "react-scrollable-feed";
+import { StaticDatePicker, LocalizationProvider } from "@mui/x-date-pickers-pro";
+
+import 'dayjs/locale/pt-br';
+import dayjs from "dayjs";
+
 
 
 export const Pop_up = (props) => {
-    const { idprojeto, trigger, setTrigger, type_tarefa } = props;
+    const { idprojeto, trigger, setTrigger, type_tarefa, idtarefa, dataProjeto } = props;
+
+    const initialValues = {
+        nome: dataProjeto?.nome,
+        github: dataProjeto?.github,
+        site: dataProjeto?.site
+    }
+
     const [form, setForm] = useState("");
     const [hasError, setHasError] = useState(false);
     const [error, setError] = useState();
+
     const [formCheck, setFormCheck] = useState([]);
     const [inputCheck, setInputCheck] = useState();
     const [isAddCheck, setIsAddCheck] = useState(false);
 
+    const [formDate, setFormDate] = useState();
+    const [dateOpen, setDateOpen] = useState(false);
+
+
+    const [tarefaData, setTarefaData] = useState();
+
+    const [observacao, setObservacao] = useState("");
+    const [isEditingObs, setIsEditingObs] = useState(false);
+    const [idEdit, setIdEdit] = useState();
+    const [isEditingCheck, setIsEditingCheck] = useState();
+
+    const [formSettings, setFormSettings] = useState(initialValues);
+
     const { user } = UserAuth();
     const dummy = useRef();
+
+    useEffect(() => {
+        if (trigger === true && props.type === "view_tarefa") {
+            try {
+                axios.post('http://localhost:8080/tarefa/getTarefa', {
+                    idtarefa: idtarefa
+                })
+                    .then((res) => {
+                        setTarefaData(res.data);
+                    })
+                    .catch(function (error) {
+                        // manipula erros da requisição
+                        console.error(error);
+                    })
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    }, [tarefaData, trigger])
 
     const onSubmit = () => {
         if (form === "") {
@@ -27,17 +79,21 @@ export const Pop_up = (props) => {
             setError("Por favor, preencher o campo abaixo!");
         } else {
             setHasError(false);
-            axios.post('http://localhost:8080/projeto/add', {
-                nome: form,
-                iduser: user.iduser
-            })
-                .then((res) => {
-                    setTrigger(false);
+            try {
+                axios.post('http://localhost:8080/projeto/add', {
+                    nome: form,
+                    iduser: user.iduser
                 })
-                .catch(function (error) {
-                    // manipula erros da requisição
-                    console.error(error);
-                })
+                    .then((res) => {
+                        setTrigger(false);
+                    })
+                    .catch(function (error) {
+                        // manipula erros da requisição
+                        console.error(error);
+                    })
+            } catch (err) {
+                console.log(err);
+            }
         }
         setForm("");
     }
@@ -52,30 +108,167 @@ export const Pop_up = (props) => {
     }
 
     const onSubmitCheck = () => {
-        if (formCheck === "" || form === "") {
+        if (formCheck === "" || form === "" || formDate === "") {
             setHasError(true);
             setError("Por favor, preencher o campo abaixo!");
         } else {
             setHasError(false);
-            axios.post("http://localhost:8080/projeto/tarefa", {
-                idprojeto: idprojeto,
-                nome: form,
-                date: "9999-12-31 23:59:59",
-                checklist: formCheck,
-                status: type_tarefa
-            })
-                .then((res) => {
-                    setTrigger(false);
-                    setFormCheck([]);
-                    setForm("");
-                    setHasError(false);
-                    setIsAddCheck(false);
+            try {
+                axios.post("http://localhost:8080/projeto/tarefa", {
+                    idprojeto: idprojeto,
+                    nome: form,
+                    date: dayjs(formDate).format("YYYY-MM-DD HH:mm:ss"),
+                    checklist: formCheck,
+                    status: type_tarefa,
+                    checklist_size: formCheck.length,
+                    checklist_done: 0
                 })
+                    .then((res) => {
+                        setTrigger(false);
+                        setFormCheck([]);
+                        setForm("");
+                        setHasError(false);
+                        setIsAddCheck(false);
+                        setDateOpen(false);
+                        setFormDate("");
+                    })
+            } catch (err) {
+                console.log(err);
+            }
         }
     }
 
     const handleDeleteCheck = (id) => {
         setFormCheck(formCheck.filter(formCheck => formCheck.id !== id))
+    }
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            setFormCheck([...formCheck, { id: crypto.randomUUID(), nome: inputCheck }]);
+            document.getElementById("add_check").value = ""
+        }
+    }
+
+    const changeStatusCheck = (id, status) => {
+        axios.post('http://localhost:8080/tarefa/updateCheckStatus', {
+            status: status,
+            idchecklist: id,
+            checklist_size: tarefaData?.tarefa[0]?.checklist_size,
+            checklist_done: tarefaData?.tarefa[0]?.checklist_done,
+            idtarefa: tarefaData?.tarefa[0]?.idtarefa,
+        })
+            .then((res) => {
+                console.log(res);
+            })
+    }
+
+    const submiteObs = () => {
+        if (observacao === "") {
+            setHasError(true);
+            setError("Por favor, preencher o campo abaixo!");
+        } else {
+            axios.post('http://localhost:8080/tarefa/addObservacao', {
+                observacao: observacao,
+                idtarefa: idtarefa
+            })
+                .then((res) => {
+                    document.getElementById("input_obs").value = ""
+                    setObservacao("");
+                })
+        }
+    }
+
+    const updateDeleteObs = (id, type) => {
+        if (type === "edit") {
+            setIsEditingObs(true);
+            setIdEdit(id);
+        } else {
+            axios.post('http://localhost:8080/tarefa/deleteObservacao', {
+                idobservacao: id
+            })
+        }
+    }
+
+    const submitUpdateObs = (obs, id) => {
+        try {
+            axios.post('http://localhost:8080/tarefa/updateObservacao', {
+                observacao: observacao === "" ? obs : observacao,
+                idobservacao: id
+            })
+                .then((res) => {
+                    setIsEditingObs(false);
+                    setIdEdit("");
+                    setObservacao("");
+                })
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const handleKeyDownCheck = (e, id, nome, type) => {
+        if (e.key === 'Enter') {
+            console.log(formCheck);
+            if (type === "edit") {
+                try {
+                    axios.post('http://localhost:8080/tarefa/updateCheckNome', {
+                        idchecklist: id,
+                        nome: form === "" ? nome : form
+                    })
+                        .then((res) => {
+                            setIsEditingCheck(false);
+                            setIdEdit("");
+                            setForm("");
+                        })
+                } catch (err) {
+                    console.log(err);
+                }
+            } else {
+                axios.post('http://localhost:8080/tarefa/addCheck', {
+                    nome: formCheck,
+                    idtarefa: idtarefa,
+                    checklist_size: tarefaData?.tarefa[0]?.checklist_size
+                }).then((res) => {
+                    setFormCheck("");
+                    document.getElementById("add_check").value = ""
+                })
+            }
+        }
+    }
+
+    const handleDeleteCheckView = (id) => {
+        try {
+            axios.post('http://localhost:8080/tarefa/deleteCheck', {
+                idchecklist: id,
+                idtarefa: idtarefa,
+                checklist_size: tarefaData?.tarefa[0]?.checklist_size
+            })
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const handleSettings = (ev) => {
+        const { name, value } = ev.target
+
+        setFormSettings({ ...formSettings, [name]: value });
+    }
+
+    const onSubmitSettings = () => {
+        console.log(dataProjeto)
+        console.log(formSettings);
+        try {
+            axios.post('http://localhost:8080/projeto/update', {
+                nome: formSettings.nome,
+                github: formSettings.github,
+                site: formSettings.site,
+                idprojeto: idprojeto
+            }).then((res) => {
+                setTrigger(false);
+                setFormSettings(initialValues);
+            })
+        } catch (err) {
+            console.log(err);
+        }
     }
 
     return (
@@ -103,9 +296,27 @@ export const Pop_up = (props) => {
                                             <p className="label">Nome</p>
                                             <input type="text" placeholder="Nome da Tarefa" onChange={(e) => setForm(e.target.value)} />
                                         </div>
-                                        <div className="date">
+                                        <div className="date" >
                                             <img src={schedule} />
-                                            <p>18 de Mai</p>
+                                            <p onClick={() => {
+                                                setDateOpen(true);
+                                            }}>{formDate ? dayjs(formDate).format('DD MMM') : "Adicionar Data"}</p>
+                                            {dateOpen ?
+                                                <StaticDatePicker
+                                                    orientation="portrait"
+                                                    className="datePicker"
+                                                    openTo='day'
+                                                    value={formDate}
+                                                    onClose={() => {
+                                                        setDateOpen(false);
+                                                    }}
+                                                    onAccept={(e) => {
+                                                        setFormDate(e);
+                                                        console.log(dayjs(new Date(e)).format("YYYY-MM-DD"));
+                                                    }}
+                                                /> :
+                                                ""
+                                            }
                                         </div>
                                         <div className="header_checklist">
                                             <p>Check-list</p>
@@ -130,7 +341,7 @@ export const Pop_up = (props) => {
                                     {isAddCheck ?
                                         <>
                                             <div className="add_check">
-                                                <input type="text" placeholder="Adicionar Check" id="add_check" onChange={(e) => setInputCheck(e.target.value)} />
+                                                <input onKeyDown={handleKeyDown} type="text" placeholder="Adicionar Check" id="add_check" onChange={(e) => setInputCheck(e.target.value)} />
                                                 <div>
                                                     <button onClick={addCheck}>Adicionar</button>
                                                     <p onClick={() => setIsAddCheck(false)}>Cancelar</p>
@@ -150,19 +361,135 @@ export const Pop_up = (props) => {
                                     setForm("");
                                     setHasError(false);
                                     setIsAddCheck(false);
+                                    setDateOpen(false);
+                                    setFormDate("");
                                 }} />
                             </Card_Add>
                             :
                             ""
                         }
                         {props.type === "view_tarefa" ?
-                            <Card>
-                                <p className="titulo">Nome do Projeto</p>
+                            <Card_Tarefa>
+                                <p className="titulo">{tarefaData?.tarefa[0]?.nome}</p>
                                 {hasError ? <Error><p>{error}</p></Error> : ""}
-                                <input type="text" onChange={(e) => setForm(e.target.value)} />
-                                <Button onClick={onSubmit}>Adicionar</Button>
-                                <img src={close} onClick={() => setTrigger(false)} />
-                            </Card>
+                                <Block_ViewTarefa>
+                                    <div className="date_viewTarefa">
+                                        <img src={schedule} />
+                                        <p>{dayjs(tarefaData?.tarefa[0]?.data).format('DD MMM')}</p>
+                                    </div>
+                                    <div className="line"></div>
+                                    <div className="header_checklist">
+                                        <p>Check-list</p>
+                                        <img className="icon_check" src={add} onClick={() => { setIsAddCheck(true); }} />
+                                    </div>
+                                    <Checklist_View>
+                                        {tarefaData?.checklist?.map((e) => (
+                                            <div className="container_check">
+                                                <div style={{display: "flex", gap: "10px", alignItems: "center", width: "100%"}}>
+                                                    {e.status === "0" ? <img onClick={() => changeStatusCheck(e.idchecklist, true)} src={check} /> : <svg xmlns="http://www.w3.org/2000/svg" onClick={() => changeStatusCheck(e.idchecklist, false)} fill="#147EFB" height="48" viewBox="0 96 960 960" width="48"><path d="m417 754 300-301-63-64-237 237-110-110-63 64 173 174ZM189 961q-39.05 0-66.525-27.475Q95 906.05 95 867V285q0-39.463 27.475-67.231Q149.95 190 189 190h582q39.463 0 67.231 27.769Q866 245.537 866 285v582q0 39.05-27.769 66.525Q810.463 961 771 961H189Zm0-94h582V285H189v582Zm0-582v582-582Z" /></svg>}
+                                                    {isEditingCheck === true && idEdit === e.idchecklist ?
+                                                        <input defaultValue={e.nome} onKeyDown={(event) => handleKeyDownCheck(event, e.idchecklist, e.nome, "edit")} onChange={(e) => setForm(e.target.value)}></input>
+                                                        :
+                                                        <>
+                                                            {e.status === "0" ? <div style={{ cursor: "pointer" }} onClick={() => { setIsEditingCheck(true); setIdEdit(e.idchecklist) }}>{e.nome}</div> : <div style={{ textDecoration: "line-through" }}>{e.nome}</div>}
+                                                        </>
+                                                    }
+                                                </div>
+                                                <svg onClick={() => handleDeleteCheckView(e.idchecklist)} className="dele" xmlns="http://www.w3.org/2000/svg" fill="#147EFB" height="48" viewBox="0 96 960 960" width="48"><path d="M261 936q-24.75 0-42.375-17.625T201 876V306h-41v-60h188v-30h264v30h188v60h-41v570q0 24-18 42t-42 18H261Zm438-630H261v570h438V306ZM367 790h60V391h-60v399Zm166 0h60V391h-60v399ZM261 306v570-570Z" /></svg>
+                                            </div>
+                                        ))}
+                                    </Checklist_View>
+                                    <div style={{ width: "100%", paddingBottom: "5px" }}>
+                                        {isAddCheck ?
+                                            <>
+                                                <div className="add_check">
+                                                    <input onKeyDown={(event) => handleKeyDownCheck(event, null, null, "add")} type="text" placeholder="Adicionar Check" id="add_check" onChange={(e) => setFormCheck(e.target.value)} />
+                                                    <div>
+                                                        <p onClick={() => setIsAddCheck(false)}>Cancelar</p>
+                                                    </div>
+                                                </div>
+                                            </>
+                                            :
+                                            ""
+                                        }
+                                    </div>
+                                    <Block_Coment>
+                                        <div className="container_observacao">
+                                            <img src={account} />
+                                            <div className="block_obs">
+                                                <textarea id="input_obs" placeholder="Adicione uma observação" onChange={(e) => setObservacao(e.target.value)} />
+                                                <button onClick={submiteObs}>Salvar</button>
+                                            </div>
+
+                                        </div>
+                                    </Block_Coment>
+                                    {tarefaData?.observacao.length > 0 ?
+                                        <>
+                                            {tarefaData?.observacao.map((e) => (
+                                                <ContainerObservacao>
+                                                    <img src={account} />
+                                                    <div className="block_right">
+                                                        {isEditingObs === true && idEdit === e.idobservacao ?
+                                                            <div className="editing">
+                                                                <textarea defaultValue={e.observacao} onChange={(e) => setObservacao(e.target.value)} />
+                                                                <div>
+                                                                    <button onClick={() => submitUpdateObs(e.observacao, e.idobservacao)}>Salvar</button>
+                                                                    <span onClick={() => {
+                                                                        setIsEditingObs(false);
+                                                                        setIdEdit("");
+                                                                        setObservacao("");
+                                                                    }}>Cancelar</span>
+                                                                </div>
+                                                            </div>
+                                                            :
+                                                            <>
+                                                                <div className="card_obs">{e.observacao}</div>
+                                                                <div className="edit_delete_obs">
+                                                                    <span onClick={() => updateDeleteObs(e.idobservacao, "edit")}>Editar</span>
+                                                                    <span onClick={() => updateDeleteObs(e.idobservacao, "delete")}>Deletar</span>
+                                                                </div>
+                                                            </>
+                                                        }
+                                                    </div>
+                                                </ContainerObservacao>
+                                            ))}
+                                        </>
+                                        :
+                                        ""
+                                    }
+
+                                </Block_ViewTarefa>
+                                <img className="close" src={close} onClick={() => {
+                                    setIsAddCheck(false);
+                                    setTrigger(false);
+                                }} />
+                            </Card_Tarefa>
+                            :
+                            ""
+                        }
+                        {props.type === "edit_projeto" ? <Card>
+                            <p className="titulo">Configurações</p>
+                            {hasError ? <Error><p>{error}</p></Error> : ""}
+                            <Block_Settings>
+                                <div>
+                                    <span>Nome do Projeto</span>
+                                    <input name="nome" defaultValue={dataProjeto?.nome} type="text" onChange={handleSettings} />
+                                </div>
+                                <div>
+                                    <span>Link Github</span>
+                                    <input name="github" defaultValue={dataProjeto?.github} type="text" onChange={handleSettings} />
+                                </div>
+                                <div>
+                                    <span>Link Site</span>
+                                    <input name="site" defaultValue={dataProjeto?.link} type="text" onChange={handleSettings} />
+                                </div>
+                            </Block_Settings>
+                            <Button onClick={onSubmitSettings}>Salvar</Button>
+                            <img src={close} onClick={() => {
+                                setTrigger(false);
+                                setFormSettings(initialValues);
+                            }} />
+                        </Card>
                             :
                             ""
                         }

@@ -86,7 +86,7 @@ export const Section_Titulo = styled.section`
 `
 
 export const Icons = styled.div`
-    width: 90px;
+    width: 150px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -94,7 +94,7 @@ export const Icons = styled.div`
     padding: 10px;
     gap: 10px;
 
-    img{
+    img, svg{
         width: 35px;
         height: 35px;
         cursor: pointer;
@@ -102,6 +102,10 @@ export const Icons = styled.div`
 
     img:hover{
         opacity: 0.8;
+    }
+
+    svg:hover{
+        opacity: 0.5;
     }
 `
 
@@ -141,6 +145,7 @@ export const Block_Tarefa = styled.div`
     display: flex;
     flex-direction: column;
     gap: 10px;
+
 `
 
 export const Block_Add = styled.div`
@@ -167,7 +172,6 @@ export const Card_Tarefa = styled.div`
     justify-content: center;
 
     padding: 0px 10px 10px 10px;
-    gap: 10px;
 
     background: #147EFB;
     border-radius: 5px;

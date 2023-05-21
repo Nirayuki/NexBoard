@@ -11,7 +11,12 @@ export const AuthContextProvider = ({children}) => {
         const userData = localStorage.getItem("user");
         
         if(userData){
-            setUser(JSON.parse(userData));
+            axios.post("http://localhost:8080/user/getuser" ,{
+                iduser: userData
+            })
+            .then((res) => {
+                setUser(res.data); 
+            })
         }else{
             setUser("");
         }

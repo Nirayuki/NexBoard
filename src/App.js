@@ -2,13 +2,18 @@ import './App.css';
 import GlobalStyle from './theme/globalStyles';
 import { AuthContextProvider } from './context/authcontext';
 import Rotas from './Routes';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from "@mui/x-date-pickers-pro";
+import 'dayjs/locale/pt-br';
 
 
 function App() {
   return (
     <AuthContextProvider>
       <GlobalStyle/>
-      <Rotas/>
+      <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="pt-br">
+        <Rotas/>
+      </LocalizationProvider>
     </AuthContextProvider>
   );
 }
