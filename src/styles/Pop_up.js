@@ -414,12 +414,45 @@ export const Block_ViewTarefa = styled.div`
     .date_viewTarefa{
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 5px;
-        color: white;
+    
 
         img{
             width: 20px;
             height: 20px;
+        }
+
+        p{
+            cursor: pointer;
+            color: white;
+        }
+
+        .delete{
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+            gap: 10px;
+
+            border-radius: 5px;
+
+            border: none;
+
+            color: white;
+            cursor: pointer;
+            background-color: #FF0000;
+        }
+
+        .delete:hover{
+            opacity: 0.8;
+        }
+
+        .datePicker{
+            position: absolute;
+            top: 0px;
+            left: 130px;
         }
     }
 

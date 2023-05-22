@@ -12,8 +12,8 @@ export const CardIndex = (props) => {
             <Block>
                 <span>80%</span>
                 <Icons>
-                    <img src={github} onClick={() => console.log("Clicou imagem")}/>
-                    <img src={link} onClick={() => console.log("Clicou imagem")}/>
+                {props.data.github ? <a href={props.data.github} target="_blank"><img src={github} /></a> : <img src={github} />}
+                        {props.data.site ? <a href={props.data.site} target="_blank"><img src={link}  /></a> : <img src={link}  />}
                 </Icons>
             </Block>
         </Card>

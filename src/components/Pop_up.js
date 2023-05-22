@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import { 
-    Container, Card, Button, Error, Card_Add, Block_Form, Block_ViewTarefa, Card_Tarefa, 
-    Checklist_View, Block_Coment, ContainerObservacao, Block_Settings } from "../styles/Pop_up";
+import {
+    Container, Card, Button, Error, Card_Add, Block_Form, Block_ViewTarefa, Card_Tarefa,
+    Checklist_View, Block_Coment, ContainerObservacao, Block_Settings
+} from "../styles/Pop_up";
 
 import close from '../Assets/close.svg';
 import schedule from '../Assets/schedule.svg';
@@ -258,15 +259,40 @@ export const Pop_up = (props) => {
         console.log(formSettings);
         try {
             axios.post('http://localhost:8080/projeto/update', {
-                nome: formSettings.nome,
-                github: formSettings.github,
-                site: formSettings.site,
+                nome: formSettings?.nome ? formSettings.nome : dataProjeto?.nome,
+                github: formSettings?.github ? formSettings.github : dataProjeto?.github,
+                site: formSettings?.site ? formSettings.site : dataProjeto?.site,
                 idprojeto: idprojeto
             }).then((res) => {
                 setTrigger(false);
                 setFormSettings(initialValues);
             })
         } catch (err) {
+            console.log(err);
+        }
+    }
+
+    const handleDeleteTarefa = (e) => {
+        try{
+            axios.post('http://localhost:8080/tarefa/delete', {
+                idtarefa: idtarefa
+            }).then((res) => {
+                setTrigger(false);
+            })
+        }catch(err){
+            console.log(err);
+        }
+    }
+
+    const handleUpdateDataTarefa = (e) => {
+        console.log(e);
+        try{
+            axios.post('http://localhost:8080/tarefa/updateDate', {
+                idtarefa: idtarefa,
+                date: dayjs(e).format("YYYY-MM-DD HH:mm:ss")
+            }).then((res) => {
+            })
+        }catch(err){
             console.log(err);
         }
     }
@@ -301,7 +327,7 @@ export const Pop_up = (props) => {
                                             <p onClick={() => {
                                                 setDateOpen(true);
                                             }}>{formDate ? dayjs(formDate).format('DD MMM') : "Adicionar Data"}</p>
-                                            {dateOpen ?
+                                            {dateOpen && props.type === "add_tarefa" ?
                                                 <StaticDatePicker
                                                     orientation="portrait"
                                                     className="datePicker"
@@ -374,8 +400,32 @@ export const Pop_up = (props) => {
                                 {hasError ? <Error><p>{error}</p></Error> : ""}
                                 <Block_ViewTarefa>
                                     <div className="date_viewTarefa">
-                                        <img src={schedule} />
-                                        <p>{dayjs(tarefaData?.tarefa[0]?.data).format('DD MMM')}</p>
+                                        <div style={{display: "flex", gap: "6px", alignItems: "center"}}>
+                                            <img src={schedule} />
+                                            <p onClick={() => {
+                                                setDateOpen(true);
+                                            }}>{dayjs(tarefaData?.tarefa[0]?.data).format('DD MMM')}</p>
+                                            {dateOpen && props.type === "view_tarefa" ?
+                                                <StaticDatePicker
+                                                    orientation="portrait"
+                                                    className="datePicker"
+                                                    openTo='day'
+                                                    value={formDate}
+                                                    onClose={() => {
+                                                        setDateOpen(false);
+                                                    }}
+                                                    onAccept={(e) => {
+                                                        handleUpdateDataTarefa(e);
+                                                        // console.log(dayjs(new Date(e)).format("YYYY-MM-DD"));
+                                                    }}
+                                                /> :
+                                                ""
+                                            }
+                                        </div>
+                                        <button className="delete" onClick={handleDeleteTarefa}>
+                                            <img src={del} />
+                                            Delete
+                                        </button>
                                     </div>
                                     <div className="line"></div>
                                     <div className="header_checklist">
@@ -385,7 +435,7 @@ export const Pop_up = (props) => {
                                     <Checklist_View>
                                         {tarefaData?.checklist?.map((e) => (
                                             <div className="container_check">
-                                                <div style={{display: "flex", gap: "10px", alignItems: "center", width: "100%"}}>
+                                                <div style={{ display: "flex", gap: "10px", alignItems: "center", width: "100%" }}>
                                                     {e.status === "0" ? <img onClick={() => changeStatusCheck(e.idchecklist, true)} src={check} /> : <svg xmlns="http://www.w3.org/2000/svg" onClick={() => changeStatusCheck(e.idchecklist, false)} fill="#147EFB" height="48" viewBox="0 96 960 960" width="48"><path d="m417 754 300-301-63-64-237 237-110-110-63 64 173 174ZM189 961q-39.05 0-66.525-27.475Q95 906.05 95 867V285q0-39.463 27.475-67.231Q149.95 190 189 190h582q39.463 0 67.231 27.769Q866 245.537 866 285v582q0 39.05-27.769 66.525Q810.463 961 771 961H189Zm0-94h582V285H189v582Zm0-582v582-582Z" /></svg>}
                                                     {isEditingCheck === true && idEdit === e.idchecklist ?
                                                         <input defaultValue={e.nome} onKeyDown={(event) => handleKeyDownCheck(event, e.idchecklist, e.nome, "edit")} onChange={(e) => setForm(e.target.value)}></input>
