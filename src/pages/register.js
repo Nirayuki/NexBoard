@@ -18,7 +18,8 @@ const initialValues = {
 
 const initialErros = {
     confirmSenha: "",
-    branco: ""
+    branco: "",
+    emailexist: ""
 }
 
 function Register() {
@@ -35,8 +36,7 @@ function Register() {
         setForm({ ...form, [name]: value });
     }
 
-    const onSubmit = () => {
-        console.log(form);
+    const onSubmit = (e) => {
         if (form.email === '' || form.nome === '' || form.senha === '' || form.senha !== form.confirmSenha) {
             setHasError(true);
 
@@ -60,14 +60,15 @@ function Register() {
                     email: form.email,
                     senha: form.senha
                 })
-                    .then((res) => {
-                        localStorage.setItem("user", res);
+                .then((res) => {
+                    if(res.data[0].message === "Email já existe"){
+                        setHasError(true);
+                        setErrors({ ...errors, ["emailexist"]: "O email já existe" });
+                    }else{
+                        localStorage.setItem("user", res.data[0].iduser);
                         window.location.reload();
-                    })
-                    .catch(function (error) {
-                        // manipula erros da requisição
-                        console.error(error);
-                    })
+                    }
+                })
             }catch(err){
                 console.log(err);
             }

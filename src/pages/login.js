@@ -40,8 +40,14 @@ function Login(){
                 senha: form.senha
             })
             .then((res) => {
-                localStorage.setItem("user", res.data.iduser);
-                window.location.reload();
+                console.log(res);
+                if(res.data === "Não entrou"){
+                    setHasError(true);
+                    setErrors("Email ou senha incorreto!");
+                }else{
+                    console.log(res);
+                    localStorage.setItem("user", res.data.iduser);
+                }
             }) 
             .catch(function (error) {
                 // manipula erros da requisição

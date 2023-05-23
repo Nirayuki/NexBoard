@@ -10,7 +10,7 @@ export const CardIndex = (props) => {
             <Link className="div_link" to={`/projeto?id=${props.data.idprojeto}`}></Link>
             <p className="titulo">{props.titulo}</p>
             <Block>
-                <span>80%</span>
+                <span>{props.data.total_tarefa_concluida > 0 ? `${((props.data.total_tarefa_concluida / props.data.total_tarefa) * 100).toFixed(0)}%` : "0%"}</span>
                 <Icons>
                 {props.data.github ? <a href={props.data.github} target="_blank"><img src={github} /></a> : <img src={github} />}
                         {props.data.site ? <a href={props.data.site} target="_blank"><img src={link}  /></a> : <img src={link}  />}

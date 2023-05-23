@@ -52,15 +52,15 @@ function Projeto() {
         axios.post('http://localhost:8080/projeto/getonetarefa', {
             idprojeto: idprojeto
         })
-            .then((res) => {
-                setTarefa(res.data.tarefa);
-                setAndamento(res.data.andamento);
-                setConcluido(res.data.concluido);
-            })
-            .catch(function (error) {
-                // manipula erros da requisição
-                console.error(error);
-            })
+        .then((res) => {
+            setTarefa(res.data.tarefa);
+            setAndamento(res.data.andamento);
+            setConcluido(res.data.concluido);
+        })
+        .catch(function (error) {
+            // manipula erros da requisição
+            console.error(error);
+        })
     }, [tarefa, andamento, concluido])
 
     const setStatus = (status) => {

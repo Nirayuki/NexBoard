@@ -339,6 +339,7 @@ export const Block_Form = styled.div`
         align-items: center;
         justify-content: space-between;
         color: white;
+        width: 100%;
         
 
         svg{
@@ -363,6 +364,12 @@ export const Block_Form = styled.div`
             border-radius: 5px;
             padding: 2px;
         }
+
+        p{
+            width: 100%;
+            max-width: 450px;
+            overflow-wrap: break-word;
+        }
    }
 
 `
@@ -380,6 +387,15 @@ export const Card_Tarefa = styled.div`
 
     position: relative;
     gap: 20px;
+
+    .input{
+        background: #FFFFFF;
+        border-radius: 5px;
+        border: none;
+        padding: 5px 0px 5px 5px;
+        width: calc(100% - 60px);
+        margin-top: 20px;
+    }
 
     .close{
         width: 38px;
@@ -400,6 +416,7 @@ export const Card_Tarefa = styled.div`
     .titulo{
         font-size: 24px;
         color: white;
+        cursor: pointer;
     }
 
 `
@@ -571,6 +588,12 @@ export const Checklist_View = styled.div`
             border: none;
             padding: 5px 0px 5px 5px;
             width: calc(100% - 15px);
+        }
+        
+        p{
+            width: 100%;
+            max-width: 450px;
+            overflow-wrap: break-word;
         }
     }
 

@@ -49,6 +49,7 @@ export const Pop_up = (props) => {
     const [isEditingObs, setIsEditingObs] = useState(false);
     const [idEdit, setIdEdit] = useState();
     const [isEditingCheck, setIsEditingCheck] = useState();
+    const [isEditing, setIsEditing] = useState(false);
 
     const [formSettings, setFormSettings] = useState(initialValues);
 
@@ -118,7 +119,7 @@ export const Pop_up = (props) => {
                 axios.post("http://localhost:8080/projeto/tarefa", {
                     idprojeto: idprojeto,
                     nome: form,
-                    date: dayjs(formDate).format("YYYY-MM-DD HH:mm:ss"),
+                    date: formDate ? dayjs(formDate).format("YYYY-MM-DD HH:mm:ss") : dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss"),
                     checklist: formCheck,
                     status: type_tarefa,
                     checklist_size: formCheck.length,
@@ -297,6 +298,22 @@ export const Pop_up = (props) => {
         }
     }
 
+    const handleKeyDownTitle = (e) => {
+        if(e.key === "Enter"){
+            try{
+                axios.post('http://localhost:8080/tarefa/updateNome', {
+                    idtarefa: idtarefa,
+                    nome: form ? form : tarefaData?.tarefa[0]?.nome
+                }).then((res) => {
+                    setForm("");
+                    setIsEditing(false);
+                })
+            }catch(err){
+                console.log(err);
+            }
+        }
+    }
+
     return (
         <>
             {trigger ?
@@ -396,7 +413,7 @@ export const Pop_up = (props) => {
                         }
                         {props.type === "view_tarefa" ?
                             <Card_Tarefa>
-                                <p className="titulo">{tarefaData?.tarefa[0]?.nome}</p>
+                                {isEditing ? <input className="input" defaultValue={tarefaData?.tarefa[0]?.nome} onKeyDown={handleKeyDownTitle} onChange={(e) => setForm(e.target.value)}></input> : <p onClick={() => setIsEditing(true)} className="titulo">{tarefaData?.tarefa[0]?.nome}</p>}
                                 {hasError ? <Error><p>{error}</p></Error> : ""}
                                 <Block_ViewTarefa>
                                     <div className="date_viewTarefa">
@@ -441,7 +458,7 @@ export const Pop_up = (props) => {
                                                         <input defaultValue={e.nome} onKeyDown={(event) => handleKeyDownCheck(event, e.idchecklist, e.nome, "edit")} onChange={(e) => setForm(e.target.value)}></input>
                                                         :
                                                         <>
-                                                            {e.status === "0" ? <div style={{ cursor: "pointer" }} onClick={() => { setIsEditingCheck(true); setIdEdit(e.idchecklist) }}>{e.nome}</div> : <div style={{ textDecoration: "line-through" }}>{e.nome}</div>}
+                                                            {e.status === "0" ? <p style={{ cursor: "pointer" }} onClick={() => { setIsEditingCheck(true); setIdEdit(e.idchecklist) }}>{e.nome}</p> : <p style={{ textDecoration: "line-through" }}>{e.nome}</p>}
                                                         </>
                                                     }
                                                 </div>

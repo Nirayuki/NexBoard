@@ -32,6 +32,12 @@ export const Header = styled.header`
         opacity: 0.8;
     }
 
+    .config{
+        width: 90px;
+        display: flex;
+        justify-content: space-between;
+    }
+
     .config img{
         width: 30px;
         height: 30px;
