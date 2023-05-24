@@ -44,7 +44,7 @@ export const Card = styled.div`
     padding: 0px 20px 20px 20px;
     gap: 20px;
 
-    width: 715px;
+    width: 500px;
     background: #2C2C2C;
     border-radius: 5px;
 
@@ -58,7 +58,7 @@ export const Card = styled.div`
 
         position: absolute;
 
-        left: 700px;
+        left: 488px;
         top: 15px;
 
         cursor: pointer;

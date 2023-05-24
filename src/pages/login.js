@@ -8,6 +8,7 @@ import persona from '../Assets/person.svg';
 import mail from '../Assets/mail.svg';
 import lock from '../Assets/lock.svg';
 
+
 const initialValues = {
     email: "",
     senha: ""
@@ -18,10 +19,6 @@ function Login(){
     const [form, setForm] = useState(initialValues);
     const [errors, setErrors] = useState("");
     const [hasError, setHasError] = useState(false);
-    const { user } = UserAuth();
-
-    
-
     const handleChange = (ev) => {
         const { name, value } = ev.target
 
@@ -35,7 +32,7 @@ function Login(){
         }else{
             setHasError(false);
             setErrors("");
-            axios.post("http://localhost:8080/user/login",{
+            axios.post(`${process.env.REACT_APP_APIPATH}/user/login`,{
                 email: form.email,
                 senha: form.senha
             })
@@ -47,6 +44,7 @@ function Login(){
                 }else{
                     console.log(res);
                     localStorage.setItem("user", res.data.iduser);
+                    window.location.reload();
                 }
             }) 
             .catch(function (error) {

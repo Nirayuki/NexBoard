@@ -118,6 +118,19 @@ export const Section_Cards = styled.section`
     gap: 10px;
     overflow-x: auto;
 
+    &::-webkit-scrollbar{
+        border: none;
+        width: 10px;
+        height: 0.5rem;
+        border-radius: 5px;
+
+    }
+
+    &::-webkit-scrollbar-thumb{
+        background-color: #5b5b5b;
+        border-radius: 5px;
+    }
+
 `
 
 export const Card = styled.div`    
@@ -145,6 +158,7 @@ export const Block_Tarefa = styled.div`
     display: flex;
     flex-direction: column;
     gap: 10px;
+
 
 `
 

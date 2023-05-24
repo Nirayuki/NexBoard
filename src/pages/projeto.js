@@ -20,10 +20,11 @@ import 'dayjs/locale/pt-br';
 import dayjs from "dayjs";
 
 import { useNavigate } from "react-router-dom";
-
+import { UserAuth } from "../context/authcontext";
 
 
 function Projeto() {
+    const { user, socket } = UserAuth();
 
     const [trigger, setTrigger] = useState(false);
     const [dataProjeto, setDataProjeto] = useState();
@@ -33,44 +34,76 @@ function Projeto() {
     const [type, setType] = useState();
     const [type_tarefa, setType_Tarefa] = useState();
     const [idTarefa, setIdTarefa] = useState();
+    const [tarefaData, setTarefaData] = useState();
+
     const urlParams = new URLSearchParams(window.location.search);
     const idprojeto = urlParams.get("id");
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.post('http://localhost:8080/projeto/getone', {
-            idprojeto: idprojeto
-        })
+        socket.on('list-tarefa-newData', (data) => {
+            setTarefa(data.tarefa);
+            setAndamento(data.andamento);
+            setConcluido(data.concluido);
+        });
+
+        socket.on('list-projeto-newData', (data) => {
+            setDataProjeto(data);
+        });
+
+        socket.on('list-tarefaView-newData', (data) => {
+            setTarefaData(data);
+        });
+
+        if (dataProjeto === undefined) {
+            axios.post(`${process.env.REACT_APP_APIPATH}/projeto/getone`, {
+                idprojeto: idprojeto
+            })
+                .then((res) => {
+                    setDataProjeto(res.data);
+                })
+                .catch(function (error) {
+                    // manipula erros da requisição
+                    console.error(error);
+                })
+        }
+
+        if (tarefa === undefined) {
+            axios.post(`${process.env.REACT_APP_APIPATH}/projeto/listTarefa/${idprojeto}`)
+                .then((res) => {
+                    setTarefa(res.data.tarefa);
+                    setAndamento(res.data.andamento);
+                    setConcluido(res.data.concluido);
+                })
+                .catch(function (error) {
+                    // manipula erros da requisição
+                    console.error(error);
+                })
+        }
+
+    }, [socket])
+
+    const getTarefa = (id) => {
+        axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/getTarefa/${id}`)
             .then((res) => {
-                setDataProjeto(res.data);
+                console.log(res.data);
+                setTarefaData(res.data);
+                setTrigger(true);
             })
             .catch(function (error) {
                 // manipula erros da requisição
                 console.error(error);
             })
-
-        axios.post('http://localhost:8080/projeto/getonetarefa', {
-            idprojeto: idprojeto
-        })
-        .then((res) => {
-            setTarefa(res.data.tarefa);
-            setAndamento(res.data.andamento);
-            setConcluido(res.data.concluido);
-        })
-        .catch(function (error) {
-            // manipula erros da requisição
-            console.error(error);
-        })
-    }, [tarefa, andamento, concluido])
+    }
 
     const setStatus = (status) => {
         try {
-            axios.post('http://localhost:8080/projeto/projetoChangeStatus', {
+            axios.post(`${process.env.REACT_APP_APIPATH}/projeto/projetoChangeStatus/${user?.iduser}`, {
                 status: status,
                 idprojeto: idprojeto
             })
                 .then((res) => {
-                    console.log(res);
+                    socket.emit('att-list-projeto', idprojeto);
                 })
                 .catch(function (error) {
                     // manipula erros da requisição
@@ -93,13 +126,13 @@ function Projeto() {
     const handleOnDrop = (e, type_card) => {
         const dataTransfering = e.dataTransfer.getData("cardData");
         try {
-            axios.post('http://localhost:8080/tarefa/tarefaChangeStatus', {
+            axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/tarefaChangeStatus`, {
                 status: type_card,
                 idtarefa: dataTransfering
             })
-                .then((res) => {
-                    console.log(res);
-                })
+            .then((res) => {
+                socket.emit('att-list-tarefa', idprojeto);
+            })
                 .catch(function (error) {
                     // manipula erros da requisição
                     console.error(error);
@@ -112,7 +145,7 @@ function Projeto() {
     const handleDelete = (e) => {
         e.preventDefault();
         try {
-            axios.post('http://localhost:8080/projeto/delete', {
+            axios.post(`${process.env.REACT_APP_APIPATH}/projeto/delete`, {
                 idprojeto: dataProjeto?.idprojeto
             }).then((res) => {
                 navigate("/index");
@@ -124,7 +157,7 @@ function Projeto() {
 
     return (
         <DefaultLayout>
-            <Pop_up trigger={trigger} setTrigger={setTrigger} type={type} dataProjeto={dataProjeto} idprojeto={idprojeto} type_tarefa={type_tarefa} idtarefa={idTarefa} />
+            {trigger ? <Pop_up trigger={trigger} setTrigger={setTrigger} type={type} dataProjeto={dataProjeto} idprojeto={idprojeto} type_tarefa={type_tarefa} idtarefa={idTarefa} tarefaData={tarefaData} setTarefaData={setTarefaData} /> : ""}
             <Container>
                 <Section_Buttons>
                     <div className="container_button_status">
@@ -165,9 +198,9 @@ function Projeto() {
                         <Block_Tarefa>
                             {tarefa?.map((e) => (
                                 <Card_Tarefa onClick={() => {
-                                    setTrigger(true);
                                     setType("view_tarefa");
                                     setIdTarefa(e.idtarefa);
+                                    getTarefa(e.idtarefa);
                                 }}
                                     draggable
                                     onDragStart={(event) => handleOnDrag(event, e)}
@@ -206,9 +239,9 @@ function Projeto() {
                         >
                             {andamento?.map((e) => (
                                 <Card_Tarefa onClick={() => {
-                                    setTrigger(true);
                                     setType("view_tarefa");
                                     setIdTarefa(e.idtarefa);
+                                    getTarefa(e.idtarefa);
                                 }}
                                     draggable
                                     onDragStart={(event) => handleOnDrag(event, e)}
@@ -245,9 +278,9 @@ function Projeto() {
                         <Block_Tarefa>
                             {concluido?.map((e) => (
                                 <Card_Tarefa onClick={() => {
-                                    setTrigger(true);
                                     setType("view_tarefa");
                                     setIdTarefa(e.idtarefa);
+                                    getTarefa(e.idtarefa);
                                 }}
                                     draggable
                                     onDragStart={(event) => handleOnDrag(event, e)}

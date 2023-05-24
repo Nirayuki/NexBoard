@@ -28,9 +28,6 @@ const GlobalStyle = createGlobalStyle`
         border-radius: 5px;
     }
 
-    &::-webkit-scrollbar-track{
-        height: 2px;
-    }
   }
 `;
  

@@ -55,7 +55,7 @@ function Register() {
             setHasError(false);
             setErrors(initialErros);
             try {
-                axios.post('http://localhost:8080/user/register', {
+                axios.post(`${process.env.REACT_APP_APIPATH}/user/register`, {
                     nome: form.nome,
                     email: form.email,
                     senha: form.senha
