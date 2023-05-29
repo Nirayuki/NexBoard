@@ -19,7 +19,8 @@ const initialValues = {
 const initialErros = {
     confirmSenha: "",
     branco: "",
-    emailexist: ""
+    emailexist: "",
+    invalidEmail: ""
 }
 
 function Register() {
@@ -27,8 +28,7 @@ function Register() {
     const [form, setForm] = useState(initialValues);
     const [errors, setErrors] = useState(initialErros);
     const [hasError, setHasError] = useState(false);
-
-    const navigate = useNavigate();
+    var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
     const handleChange = (ev) => {
         const { name, value } = ev.target
@@ -37,19 +37,35 @@ function Register() {
     }
 
     const onSubmit = (e) => {
-        if (form.email === '' || form.nome === '' || form.senha === '' || form.senha !== form.confirmSenha) {
+        if (form.email === '' || form.nome === '' || form.senha === '' || form.senha !== form.confirmSenha || !form.email.match(validRegex)) {
             setHasError(true);
+            console.log(errors);
 
             if (form.email === "" || form.nome === "" || form.senha === "") {
-                setErrors({ ...errors, ["branco"]: "Por favor, preencher todos os campos." });
+                setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    branco: "Por favor, preencher todos os campos.",
+                  }));
             } else {
-                setErrors({ ...errors, ["branco"]: "" });
+                setErrors((prevErrors) => ({ ...prevErrors, branco: "" }));
             }
 
             if (form.senha !== form.confirmSenha) {
-                setErrors({ ...errors, ["confirmSenha"]: "As senhas não estão iguais." });
+                setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    confirmSenha: "Senha incorreta!",
+                  }));
             } else {
-                setErrors({ ...errors, ["confirmSenha"]: "" });
+                setErrors((prevErrors) => ({ ...prevErrors, confirmSenha: "" }));
+            }
+
+            if(!form.email.match(validRegex)){
+                setErrors((prevErrors) => ({
+                    ...prevErrors,
+                    invalidEmail: "Email inválido.",
+                  }));
+            }else{
+                setErrors((prevErrors) => ({ ...prevErrors, invalidEmail: "" }));
             }
         } else {
             setHasError(false);
@@ -61,10 +77,18 @@ function Register() {
                     senha: form.senha
                 })
                 .then((res) => {
-                    if(res.data[0].message === "Email já existe"){
+                    if(res.data.message === "Email já existe"){
                         setHasError(true);
-                        setErrors({ ...errors, ["emailexist"]: "O email já existe" });
+                        setErrors((prevErrors) => ({
+                            ...prevErrors,
+                            emailexist: "Email já existe.",
+                          }));
                     }else{
+                        setHasError(false);
+                        setErrors((prevErrors) => ({
+                            ...prevErrors,
+                            emailexist: "",
+                          }));
                         localStorage.setItem("user", res.data[0].iduser);
                         window.location.reload();
                     }
@@ -81,8 +105,10 @@ function Register() {
                 <img className="persona" src={persona} />
                 {hasError ?
                     <Error>
-                        {errors.branco ? <p>{errors.branco}</p> : ""}
-                        {errors.confirmSenha ? <p>{errors.confirmSenha}</p> : ""}
+                        {errors.branco && <p>{errors.branco}</p>}
+                        {errors.confirmSenha && <p>{errors.confirmSenha}</p>}
+                        {errors.emailexist && <p>{errors.emailexist}</p>}
+                        {errors.invalidEmail && <p>{errors.invalidEmail}</p>}
                     </Error> :
                     ""
                 }
