@@ -15,7 +15,7 @@ function Main() {
 
     useEffect(() => {
         if (listProjetos === undefined) {
-            axios.post(`http://localhost:8080/projeto/list`, {
+            axios.post(`${process.env.REACT_APP_APIPATH}/projeto/list`, {
                 iduser: user?.iduser
             })
                 .then((res) => {
