@@ -19,6 +19,7 @@ import { StaticDatePicker, LocalizationProvider } from "@mui/x-date-pickers-pro"
 
 import 'dayjs/locale/pt-br';
 import dayjs from "dayjs";
+import { computeHeadingLevel } from "@testing-library/react";
 
 
 
@@ -54,29 +55,20 @@ export const Pop_up = (props) => {
 
 
     const onSubmit = () => {
-        if (form === "") {
-            setHasError(true);
-            setError("Por favor, preencher o campo abaixo!");
-        } else {
-            setHasError(false);
-            try {
-                axios.post(`${process.env.REACT_APP_APIPATH}/projeto/add`, {
-                    nome: form,
-                    iduser: user.iduser
-                })
-                    .then((res) => {
-                        setTrigger(false);
-                        socket.emit('list-main', user.iduser);
-                    })
-                    .catch(function (error) {
-                        // manipula erros da requisição
-                        console.error(error);
-                    })
-            } catch (err) {
-                console.log(err);
-            }
-        }
-        setForm("");
+        axios.post(`${process.env.REACT_APP_APIPATH}/projeto/add`, {
+            nome: form,
+            iduser: user.iduser
+        })
+            .then((res) => {
+                setTrigger(false);
+                setForm("");
+                socket.emit('list-main', user.iduser);
+            })
+            .catch(function (error) {
+                setHasError(true);
+                setError(error.response.data);
+                console.error(error);
+            })
     }
 
     const addCheck = (e) => {
@@ -89,35 +81,30 @@ export const Pop_up = (props) => {
     }
 
     const onSubmitCheck = () => {
-        if (formCheck === "" || form === "" || formDate === "") {
-            setHasError(true);
-            setError("Por favor, preencher o campo abaixo!");
-        } else {
-            setHasError(false);
-            try {
-                axios.post(`${process.env.REACT_APP_APIPATH}/projeto/tarefa`, {
-                    idprojeto: idprojeto,
-                    nome: form,
-                    date: formDate ? dayjs(formDate).format("YYYY-MM-DD HH:mm:ss") : dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss"),
-                    checklist: formCheck,
-                    status: type_tarefa,
-                    checklist_size: formCheck.length,
-                    checklist_done: 0
-                })
-                    .then((res) => {
-                        setTrigger(false);
-                        setFormCheck([]);
-                        setForm("");
-                        setHasError(false);
-                        setIsAddCheck(false);
-                        setDateOpen(false);
-                        setFormDate("");
-                        socket.emit('att-list-tarefa', idprojeto);
-                    })
-            } catch (err) {
-                console.log(err);
-            }
-        }
+        axios.post(`${process.env.REACT_APP_APIPATH}/projeto/tarefa`, {
+            idprojeto: idprojeto,
+            nome: form,
+            date: formDate ? dayjs(formDate).format("YYYY-MM-DD HH:mm:ss") : dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss"),
+            checklist: formCheck,
+            status: type_tarefa,
+            checklist_size: formCheck.length,
+            checklist_done: 0
+        })
+            .then((res) => {
+                setTrigger(false);
+                setFormCheck([]);
+                setForm("");
+                setHasError(false);
+                setIsAddCheck(false);
+                setDateOpen(false);
+                setFormDate("");
+                socket.emit('att-list-tarefa', idprojeto);
+            })
+            .catch((error) => {
+                setHasError(true);
+                setError(error.response.data);
+                console.error(error);
+            })
     }
 
     const handleDeleteCheck = (id) => {
@@ -140,6 +127,9 @@ export const Pop_up = (props) => {
         }).then((res) =>{
             socket.emit('att-list-tarefaView', idtarefa);
         })
+        .catch((error) => {
+            console.error(error);
+        })
     }
 
     const submiteObs = () => {
@@ -155,6 +145,9 @@ export const Pop_up = (props) => {
                     setObservacao("");
                     socket.emit('att-list-tarefaView', idtarefa);
                 })
+                .catch((error) => {
+                    console.error(error);
+                })
         }
     }
 
@@ -168,43 +161,44 @@ export const Pop_up = (props) => {
             }).then((res) => {
                 socket.emit('att-list-tarefaView', idtarefa);
             })
+            .catch((error) => {
+                console.error(error);
+            })
         }
     }
 
     const submitUpdateObs = (obs, id) => {
-        try {
-            axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/updateObservacao`, {
-                observacao: observacao === "" ? obs : observacao,
-                idobservacao: id
+        axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/updateObservacao`, {
+            observacao: observacao === "" ? obs : observacao,
+            idobservacao: id
+        })
+            .then((res) => {
+                setIsEditingObs(false);
+                setIdEdit("");
+                setObservacao("");
+                socket.emit('att-list-tarefaView', idtarefa);
             })
-                .then((res) => {
-                    setIsEditingObs(false);
-                    setIdEdit("");
-                    setObservacao("");
-                    socket.emit('att-list-tarefaView', idtarefa);
-                })
-        } catch (err) {
-            console.log(err);
-        }
+            .catch((error) =>{
+                console.error(error);
+            })
     }
 
     const handleKeyDownCheck = (e, id, nome, type) => {
         if (e.key === 'Enter') {
             if (type === "edit") {
-                try {
-                    axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/updateCheckNome/${idtarefa}`, {
-                        idchecklist: id,
-                        nome: form === "" ? nome : form
+                axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/updateCheckNome/${idtarefa}`, {
+                    idchecklist: id,
+                    nome: form === "" ? nome : form
+                })
+                    .then((res) => {
+                        setIsEditingCheck(false);
+                        setIdEdit("");
+                        setForm("");
+                        socket.emit('att-list-tarefaView', idtarefa);
                     })
-                        .then((res) => {
-                            setIsEditingCheck(false);
-                            setIdEdit("");
-                            setForm("");
-                            socket.emit('att-list-tarefaView', idtarefa);
-                        })
-                } catch (err) {
-                    console.log(err);
-                }
+                    .catch((error) =>{
+                        console.error(error);
+                    })
             } else {
                 axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/addCheck`, {
                     nome: formCheck,
@@ -215,21 +209,23 @@ export const Pop_up = (props) => {
                     document.getElementById("add_check").value = ""
                     socket.emit('att-list-tarefaView', idtarefa);
                 })
+                .catch((error) => {
+                    console.error(error);
+                })
             }
         }
     }
 
     const handleDeleteCheckView = (id) => {
-        try {
-            axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/deleteCheck/${idtarefa}`, {
-                idchecklist: id,
-                checklist_size: tarefaData?.tarefa[0]?.checklist_size
-            }).then((res) =>{
-                socket.emit('att-list-tarefaView', idtarefa);
-            })
-        } catch (err) {
-            console.log(err);
-        }
+        axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/deleteCheck/${idtarefa}`, {
+            idchecklist: id,
+            checklist_size: tarefaData?.tarefa[0]?.checklist_size
+        }).then((res) =>{
+            socket.emit('att-list-tarefaView', idtarefa);
+        })
+        .catch((error) => {
+            console.error(error);
+        })
     }
 
     const handleSettings = (ev) => {
@@ -250,53 +246,52 @@ export const Pop_up = (props) => {
                 setFormSettings(initialValues);
                 socket.emit('att-list-projeto', idprojeto);
             })
+            .catch((error) => {
+                console.error(error);
+            })
         } catch (err) {
             console.log(err);
         }
     }
 
     const handleDeleteTarefa = (e) => {
-        try{
-            axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/delete/${idprojeto}`, {
-                idtarefa: idtarefa
-            }).then((res) => {
-                setTrigger(false);
-                socket.emit('att-list-tarefa', idprojeto);
-            })
-        }catch(err){
-            console.log(err);
-        }
+        axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/delete/${idprojeto}`, {
+            idtarefa: idtarefa
+        }).then((res) => {
+            setTrigger(false);
+            socket.emit('att-list-tarefa', idprojeto);
+        })
+        .catch((error) => {
+            console.error(error);
+        })
     }
 
     const handleUpdateDataTarefa = (e) => {
-        console.log(e);
-        try{
-            axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/updateDate/${idtarefa}`, {
-                date: dayjs(e).format("YYYY-MM-DD HH:mm:ss"),
-                idprojeto: idprojeto
-            }).then((res) =>{
-                socket.emit('att-list-tarefaView', idtarefa);
-            })
+        axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/updateDate/${idtarefa}`, {
+            date: dayjs(e).format("YYYY-MM-DD HH:mm:ss"),
+            idprojeto: idprojeto
+        }).then((res) =>{
+            socket.emit('att-list-tarefaView', idtarefa);
+        })
+        .catch((error) => {
+            console.error(error);
+        })
 
-        }catch(err){
-            console.log(err);
-        }
     }
 
     const handleKeyDownTitle = (e) => {
         if(e.key === "Enter"){
-            try{
-                axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/updateNome/${idtarefa}`, {
-                    nome: form ? form : tarefaData?.tarefa[0]?.nome,
-                    idprojeto: idprojeto
-                }).then((res) => {
-                    setForm("");
-                    setIsEditing(false);
-                    socket.emit('att-list-tarefaView', idtarefa);
-                })
-            }catch(err){
-                console.log(err);
-            }
+            axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/updateNome/${idtarefa}`, {
+                nome: form ? form : tarefaData?.tarefa[0]?.nome,
+                idprojeto: idprojeto
+            }).then((res) => {
+                setForm("");
+                setIsEditing(false);
+                socket.emit('att-list-tarefaView', idtarefa);
+            })
+            .catch((error) => {
+                console.error(error);
+            })
         }
     }
 

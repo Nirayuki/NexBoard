@@ -16,19 +16,13 @@ const initialValues = {
     confirmSenha: ""
 }
 
-const initialErros = {
-    confirmSenha: "",
-    branco: "",
-    emailexist: "",
-    invalidEmail: ""
-}
-
 function Register() {
 
     const [form, setForm] = useState(initialValues);
-    const [errors, setErrors] = useState(initialErros);
+    const [errors, setErrors] = useState();
     const [hasError, setHasError] = useState(false);
-    var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
+    const navigate = useNavigate();
 
     const handleChange = (ev) => {
         const { name, value } = ev.target
@@ -37,65 +31,24 @@ function Register() {
     }
 
     const onSubmit = (e) => {
-        if (form.email === '' || form.nome === '' || form.senha === '' || form.senha !== form.confirmSenha || !form.email.match(validRegex)) {
+        if (form.senha !== form.confirmSenha) {
             setHasError(true);
-            console.log(errors);
-
-            if (form.email === "" || form.nome === "" || form.senha === "") {
-                setErrors((prevErrors) => ({
-                    ...prevErrors,
-                    branco: "Por favor, preencher todos os campos.",
-                  }));
-            } else {
-                setErrors((prevErrors) => ({ ...prevErrors, branco: "" }));
-            }
-
-            if (form.senha !== form.confirmSenha) {
-                setErrors((prevErrors) => ({
-                    ...prevErrors,
-                    confirmSenha: "Senha incorreta!",
-                  }));
-            } else {
-                setErrors((prevErrors) => ({ ...prevErrors, confirmSenha: "" }));
-            }
-
-            if(!form.email.match(validRegex)){
-                setErrors((prevErrors) => ({
-                    ...prevErrors,
-                    invalidEmail: "Email inválido.",
-                  }));
-            }else{
-                setErrors((prevErrors) => ({ ...prevErrors, invalidEmail: "" }));
-            }
+            setErrors("A senhas devem ser idênticas");
         } else {
-            setHasError(false);
-            setErrors(initialErros);
-            try {
-                axios.post(`${process.env.REACT_APP_APIPATH}/user/register`, {
-                    nome: form.nome,
-                    email: form.email,
-                    senha: form.senha
-                })
+            axios.post(`${process.env.REACT_APP_APIPATH}/user/register`, {
+                nome: form.nome,
+                email: form.email,
+                senha: form.senha
+            })
                 .then((res) => {
-                    if(res.data.message === "Email já existe"){
-                        setHasError(true);
-                        setErrors((prevErrors) => ({
-                            ...prevErrors,
-                            emailexist: "Email já existe.",
-                          }));
-                    }else{
-                        setHasError(false);
-                        setErrors((prevErrors) => ({
-                            ...prevErrors,
-                            emailexist: "",
-                          }));
-                        localStorage.setItem("user", res.data[0].iduser);
-                        window.location.reload();
-                    }
+                    localStorage.setItem("user", res.data[0].iduser);
+                    window.location.reload();
                 })
-            }catch(err){
-                console.log(err);
-            }
+                .catch((error) => {
+                    setHasError(true);
+                    setErrors(error.response.data.erro);
+                    console.error(error);
+                })
         }
     }
 
@@ -105,10 +58,7 @@ function Register() {
                 <img className="persona" src={persona} />
                 {hasError ?
                     <Error>
-                        {errors.branco && <p>{errors.branco}</p>}
-                        {errors.confirmSenha && <p>{errors.confirmSenha}</p>}
-                        {errors.emailexist && <p>{errors.emailexist}</p>}
-                        {errors.invalidEmail && <p>{errors.invalidEmail}</p>}
+                        <p>{errors}</p>
                     </Error> :
                     ""
                 }
