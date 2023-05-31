@@ -679,6 +679,7 @@ export const ContainerObservacao = styled.div`
         width: calc(100% - 20px);
         border-radius: 5px;
         color: black;
+        white-space: pre-line;
 
     }
 
@@ -771,6 +772,19 @@ export const Block_Settings = styled.div`
         gap: 10px;
 
         color: white;
+    }
+
+    .delete{
+        padding-top: 30px;
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        gap: 2px;
+        color: white;
+
+        p{
+            font-size: 14px;
+        }
     }
 
     input{

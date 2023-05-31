@@ -17,6 +17,8 @@ import { StaticDatePicker } from "@mui/x-date-pickers-pro";
 
 import 'dayjs/locale/pt-br';
 import dayjs from "dayjs";
+import { TextareaAutosize } from "@mui/material";
+import { styled } from '@mui/system';
 
 
 export const Pop_up_ViewTarefa = (props) => {
@@ -40,7 +42,47 @@ export const Pop_up_ViewTarefa = (props) => {
     const [idEdit, setIdEdit] = useState();
     const [isEditingCheck, setIsEditingCheck] = useState();
 
+    let Value, ValuEdit;
+
     const { user, socket } = useAuth();
+
+    const Textarea = styled(TextareaAutosize)(
+        ({ theme }) => `
+        width: 320px;
+        font-family: IBM Plex Sans, sans-serif;
+        font-size: 0.875rem;
+        font-weight: 400;
+        line-height: 1.5;
+        padding: 12px;
+        border-radius: 12px;
+
+        -webkit-scrollbar{
+            border: none;
+            width: 10px;
+            height: 0.1rem;
+            border-radius: 5px;
+    
+        }
+    
+        -webkit-scrollbar-thumb{
+            background-color: #5b5b5b;
+            border-radius: 5px;
+        }
+    
+        -webkit-scrollbar-track{
+            height: 2px;
+        }
+        
+        // firefox
+        &:focus-visible {
+          outline: 0;
+        }
+      `,
+    );
+
+    const handleChange = (e) => {
+        Value = e.target.value;
+    }
 
     const handleKeyDownTitle = (e) => {
         if (e.key === "Enter") {
@@ -145,16 +187,16 @@ export const Pop_up_ViewTarefa = (props) => {
     }
 
     const submiteObs = () => {
-        if (observacao === "") {
+        if (Value === "") {
             setHasError(true);
             setError("Por favor, preencher o campo abaixo!");
         } else {
             axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/addObservacao/${idtarefa}`, {
-                observacao: observacao,
+                observacao: Value,
             })
                 .then((res) => {
                     document.getElementById("input_obs").value = ""
-                    setObservacao("");
+                    Value = "";
                     socket.emit('att-list-tarefaView', idtarefa);
                 })
                 .catch((error) => {
@@ -181,7 +223,7 @@ export const Pop_up_ViewTarefa = (props) => {
 
     const submitUpdateObs = (obs, id) => {
         axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/updateObservacao`, {
-            observacao: observacao === "" ? obs : observacao,
+            observacao: ValuEdit === "" ? obs : ValuEdit,
             idobservacao: id
         })
             .then((res) => {
@@ -270,7 +312,13 @@ export const Pop_up_ViewTarefa = (props) => {
                             <div className="container_observacao">
                                 <img src={account} />
                                 <div className="block_obs">
-                                    <textarea id="input_obs" placeholder="Adicione uma observação" onChange={(e) => setObservacao(e.target.value)} />
+                                    <Textarea
+                                        className="textarea_ui"
+                                        id="input_obs"
+                                        placeholder="Digite uma observação aqui..."
+                                        maxRows={5}
+                                        onChange={handleChange}
+                                    />
                                     <button onClick={submiteObs}>Salvar</button>
                                 </div>
                             </div>
@@ -283,7 +331,14 @@ export const Pop_up_ViewTarefa = (props) => {
                                         <div className="block_right">
                                             {isEditingObs === true && idEdit === e.idobservacao ?
                                                 <div className="editing">
-                                                    <textarea defaultValue={e.observacao} onChange={(e) => setObservacao(e.target.value)} />
+                                                    <Textarea
+                                                        className="textarea_ui"
+                                                        defaultValue={e.observacao}
+                                                        id="input_obs"
+                                                        placeholder="Digite uma observação aqui..."
+                                                        maxRows={5}
+                                                        onChange={(e) => ValuEdit = e.target.value}
+                                                    />
                                                     <div>
                                                         <button onClick={() => submitUpdateObs(e.observacao, e.idobservacao)}>Salvar</button>
                                                         <span onClick={() => {

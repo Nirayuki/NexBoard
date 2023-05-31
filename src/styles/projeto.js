@@ -7,8 +7,14 @@ export const Container = styled.div`
     flex-direction: column;
     align-items: flex-start;
 
-    padding: 50px;
-    gap: 10px;
+    padding: 20px 50px 10px 50px;
+    gap: 25px;
+
+    .line{
+        width: 100%;
+        height: 1px;
+        background-color: #808080;
+    }
 
     
 `
@@ -73,30 +79,38 @@ export const Section_Titulo = styled.section`
     width: 100%;
     display: flex;
 
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: flex-end;
 
-    padding: 10px;
-    gap: 10px;
 
-    font-size: 24px;
-    color: white;
+    .container_titulo{
+        width: 100%;
+        display: flex;
+        
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+
+        font-size: 24px;
+        color: white;
+        height: 50px;
+    }
+
+    
 
 `
 
 export const Icons = styled.div`
-    width: 150px;
+    width: 190px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: flex-start;
-    padding: 10px;
+    align-items: center;
     gap: 10px;
 
     img, svg{
-        width: 35px;
-        height: 35px;
+        width: 28px;
+        height: 28px;
         cursor: pointer;
     }
 
@@ -106,6 +120,29 @@ export const Icons = styled.div`
 
     svg:hover{
         opacity: 0.5;
+    }
+
+    button{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: 0px 10px;
+        gap: 10px;
+
+        border-radius: 5px;
+
+        border: none;
+
+        color: white;
+        cursor: pointer;
+        background-color: #147EFB;
+
+        font-size: 15px;
+    }
+
+    button:hover{
+        opacity: 0.8;
     }
 `
 
@@ -159,8 +196,24 @@ export const Block_Tarefa = styled.div`
     width: 353px;
     display: flex;
     flex-direction: column;
+    padding-right: 15px;
     gap: 10px;
+    max-height: 320px;
+    overflow-y: auto;
+    overflow-x: hidden;
 
+    &::-webkit-scrollbar{
+        border: none;
+        width: 10px;
+        height: 0.5rem;
+        border-radius: 5px;
+
+    }
+
+    &::-webkit-scrollbar-thumb{
+        background-color: #5b5b5b;
+        border-radius: 5px;
+    }
 
 `
 

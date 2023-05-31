@@ -65,7 +65,7 @@ export const Pop_up_AddTarefa = (props) => {
             nome: form,
             date: formDate ? dayjs(formDate).format("YYYY-MM-DD HH:mm:ss") : dayjs(new Date()).format("YYYY-MM-DD HH:mm:ss"),
             checklist: formCheck,
-            status: "Tarefa",
+            status: type_tarefa,
             checklist_size: formCheck.length,
             checklist_done: 0
         })
