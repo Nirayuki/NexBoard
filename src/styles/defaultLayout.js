@@ -26,6 +26,7 @@ export const Header = styled.header`
         text-decoration: none;
         cursor: pointer;
         color: white;
+        font-size: 20px;
     }
 
     .navigation a:hover{

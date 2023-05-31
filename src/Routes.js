@@ -1,32 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Login from "./pages/login";
 import Main from "./pages/main";
 import Register from "./pages/register";
 import Projeto from "./pages/projeto";
-import { Route, Routes, BrowserRouter, Navigate } from "react-router-dom";
-import { UserAuth } from "./context/authcontext";
+import { Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectRoute";
 
-
 const Rotas = () => {
-    const { user } = UserAuth();
+
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={user ? <Navigate to={"/index"} replace/> : <Login />} />
-                <Route path="/index" element={
-                    <ProtectedRoute user={user}>
-                        <Main />
-                    </ProtectedRoute>
-                } />
-                <Route path="/projeto" element={
-                    <ProtectedRoute user={user}>
-                        <Projeto />
-                    </ProtectedRoute>
-                } />
-                <Route path="/register" element={user ? <Navigate to={"/index"} replace/> : <Register />} />
-            </Routes>
-        </BrowserRouter>
+        <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+
+
+            <Route path="/" element={<ProtectedRoute />}>
+                <Route path="/" element={<Main />} />
+                <Route path="/projeto" element={<Projeto />} />
+            </Route>
+        </Routes>
     )
 }
 

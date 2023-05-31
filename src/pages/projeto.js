@@ -11,20 +11,22 @@ import add from '../Assets/add.svg';
 import schedule from '../Assets/schedule.svg';
 import check from '../Assets/check_box_outline.svg';
 import checkdone from '../Assets/check_box.svg';
-import settings from '../Assets/settings.svg';
 
 import axios from "axios";
-import { Pop_up } from "../components/Pop_up";
+import { Pop_up_ViewTarefa } from "../components/Pop_up_ViewTarefa";
+import { Pop_up_EditProjeto } from "../components/Pop_up_EditProjeto";
+import { Pop_up_AddTarefa } from "../components/Pop_up_AddTarefa";
 
 import 'dayjs/locale/pt-br';
 import dayjs from "dayjs";
 
 import { useNavigate } from "react-router-dom";
-import { UserAuth } from "../context/authcontext";
+import { useAuth } from "../context/authcontext";
 
 
 function Projeto() {
-    const { user, socket } = UserAuth();
+    
+    const { user, socket } = useAuth();
 
     const [trigger, setTrigger] = useState(false);
     const [dataProjeto, setDataProjeto] = useState();
@@ -41,17 +43,17 @@ function Projeto() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        socket.on('list-tarefa-newData', (data) => {
+        socket?.on('list-tarefa-newData', (data) => {
             setTarefa(data.tarefa);
             setAndamento(data.andamento);
             setConcluido(data.concluido);
         });
 
-        socket.on('list-projeto-newData', (data) => {
+        socket?.on('list-projeto-newData', (data) => {
             setDataProjeto(data);
         });
 
-        socket.on('list-tarefaView-newData', (data) => {
+        socket?.on('list-tarefaView-newData', (data) => {
             setTarefaData(data);
         });
 
@@ -61,6 +63,7 @@ function Projeto() {
             })
                 .then((res) => {
                     setDataProjeto(res.data);
+                    document.title = `NexBoard - ${res.data.nome}`
                 })
                 .catch(function (error) {
                     // manipula erros da requisição
@@ -157,7 +160,9 @@ function Projeto() {
 
     return (
         <DefaultLayout>
-            {trigger ? <Pop_up trigger={trigger} setTrigger={setTrigger} type={type} dataProjeto={dataProjeto} idprojeto={idprojeto} type_tarefa={type_tarefa} idtarefa={idTarefa} tarefaData={tarefaData} setTarefaData={setTarefaData} /> : ""}
+            {trigger && type === "view_tarefa" ? <Pop_up_ViewTarefa setTrigger={setTrigger} idprojeto={idprojeto} idtarefa={idTarefa} tarefaData={tarefaData} /> : ""}
+            {trigger && type === "edit_projeto" ? <Pop_up_EditProjeto setTrigger={setTrigger} idprojeto={idprojeto} dataProjeto={dataProjeto} /> : ""}
+            {trigger && type === "add_tarefa" ? <Pop_up_AddTarefa setTrigger={setTrigger} idprojeto={idprojeto} dataProjeto={dataProjeto} /> : ""}
             <Container>
                 <Section_Buttons>
                     <div className="container_button_status">
@@ -209,7 +214,7 @@ function Projeto() {
                                     <div className="icons">
                                         <div>
                                             <img src={schedule} />
-                                            <span>{dayjs(e.data).format('DD MMM')}</span>
+                                            <span>{dayjs(e.data).locale('pt-br').format('DD MMM')}</span>
                                         </div>
                                         <div>
                                             {e.checklist_done === e.checklist_size ? <img src={checkdone} /> : <img src={check} />}
@@ -250,7 +255,7 @@ function Projeto() {
                                     <div className="icons">
                                         <div>
                                             <img src={schedule} />
-                                            <span>{dayjs(e.data).format('DD MMM')}</span>
+                                            <span>{dayjs(e.data).locale('pt-br').format('DD MMM')}</span>
                                         </div>
                                         <div>
                                             {e.checklist_done === e.checklist_size ? <img src={checkdone} /> : <img src={check} />}
@@ -289,7 +294,7 @@ function Projeto() {
                                     <div className="icons">
                                         <div>
                                             <img src={schedule} />
-                                            <span>{dayjs(e.data).format('DD MMM')}</span>
+                                            <span>{dayjs(e.data).locale('pt-br').format('DD MMM')}</span>
                                         </div>
                                         <div>
                                             {e.checklist_done === e.checklist_size ? <img src={checkdone} /> : <img src={check} />}
