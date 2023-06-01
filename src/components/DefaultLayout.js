@@ -10,7 +10,7 @@ export const DefaultLayout = ({ children }) => {
         <>
             <Header>
                 <div className="navigation">
-                    <Link to="/index">Projetos</Link>
+                    <Link to="/">Projetos</Link>
                 </div>
                 <div className="config">
                     <img src={config} />

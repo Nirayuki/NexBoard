@@ -4,7 +4,7 @@ export const Container = styled.div`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 100px;
+    padding: 100px 100px 0px 100px;
     gap: 10px;
 `
 
@@ -28,11 +28,11 @@ export const Section = styled.section`
 export const Button = styled.button`
     display: flex;
     align-items: center;
+    justify-content: center;
 
     padding: 10px;
     gap: 10px;
-    width: 220px;
-    height: 48px;
+    height: 38px;
 
     background: #147EFB;
     border-radius: 5px;
@@ -41,7 +41,7 @@ export const Button = styled.button`
 
     color: white;
 
-    font-size: 20px;
+    font-size: 18px;
 
     cursor: pointer;
 
@@ -49,9 +49,10 @@ export const Button = styled.button`
         opacity: 0.8;
     }
 
-    img{
+    svg{
         width: 28px;
         height: 28px;
+        fill: white;
     }
 `
 
