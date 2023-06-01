@@ -151,7 +151,7 @@ export const Section_Cards = styled.section`
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 10px;
+    padding: 10px 10px 10px 0px;
     gap: 10px;
     overflow-x: auto;
 
@@ -188,7 +188,7 @@ export const Card = styled.div`
         width: 100%;
         height: 0px;
 
-        border: 2px solid rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.5);
     }
 `
 
