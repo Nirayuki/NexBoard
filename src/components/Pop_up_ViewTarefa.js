@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Block_ViewTarefa, Card_Tarefa,
     Checklist_View, Block_Coment, ContainerObservacao, Error, Container
@@ -45,6 +45,23 @@ export const Pop_up_ViewTarefa = (props) => {
     let Value, ValuEdit;
 
     const { user, socket } = useAuth();
+
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+
+        };
+
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+
+
+    }, []);
 
     const Textarea = styled(TextareaAutosize)(
         ({ theme }) => `
@@ -170,18 +187,23 @@ export const Pop_up_ViewTarefa = (props) => {
                         console.error(error);
                     })
             } else {
-                axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/addCheck`, {
-                    nome: formCheck,
-                    idtarefa: idtarefa,
-                    checklist_size: tarefaData?.tarefa[0]?.checklist_size
-                }).then((res) => {
-                    setFormCheck("");
-                    document.getElementById("add_check").value = ""
-                    socket.emit('att-list-tarefaView', idtarefa);
-                })
-                    .catch((error) => {
-                        console.error(error);
+                console.log(formCheck);
+                if (formCheck !== "") {
+                    axios.post(`${process.env.REACT_APP_APIPATH}/tarefa/addCheck`, {
+                        nome: formCheck,
+                        idtarefa: idtarefa,
+                        checklist_size: tarefaData?.tarefa[0]?.checklist_size
+                    }).then((res) => {
+                        setFormCheck("");
+                        document.getElementById("add_check").value = ""
+                        socket.emit('att-list-tarefaView', idtarefa);
                     })
+                        .catch((error) => {
+                            console.error(error);
+                        })
+                } else {
+                    return
+                }
             }
         }
     }
@@ -242,7 +264,14 @@ export const Pop_up_ViewTarefa = (props) => {
         <Container>
             <div className="absolute">
                 <Card_Tarefa>
-                    {isEditing ? <input className="input" defaultValue={tarefaData?.tarefa[0]?.nome} onKeyDown={handleKeyDownTitle} onChange={(e) => setForm(e.target.value)}></input> : <p onClick={() => setIsEditing(true)} className="titulo">{tarefaData?.tarefa[0]?.nome}</p>}
+                    <div className="titulo_cont">
+                        {isEditing ? <input className="input" defaultValue={tarefaData?.tarefa[0]?.nome} onKeyDown={handleKeyDownTitle} onChange={(e) => setForm(e.target.value)}></input> : <p onClick={() => setIsEditing(true)} className="titulo">{tarefaData?.tarefa[0]?.nome}</p>}
+                        <img className="close" src={close} onClick={() => {
+                            socket.emit('att-list-tarefa', idprojeto);
+                            setIsAddCheck(false);
+                            setTrigger(false);
+                        }} />
+                    </div>
                     {hasError ? <Error><p>{error}</p></Error> : ""}
                     <Block_ViewTarefa>
                         <div className="date_viewTarefa">
@@ -280,7 +309,7 @@ export const Pop_up_ViewTarefa = (props) => {
                         <Checklist_View>
                             {tarefaData?.checklist?.map((e) => (
                                 <div className="container_check">
-                                    <div style={{ display: "flex", gap: "10px", alignItems: "center", width: "100%" }}>
+                                    <div style={{ display: "flex", gap: "10px", alignItems: "center", width: "80%" }}>
                                         {e.status === "0" ? <img onClick={() => changeStatusCheck(e.idchecklist, true)} src={check} /> : <svg xmlns="http://www.w3.org/2000/svg" onClick={() => changeStatusCheck(e.idchecklist, false)} fill="#147EFB" height="48" viewBox="0 96 960 960" width="48"><path d="m417 754 300-301-63-64-237 237-110-110-63 64 173 174ZM189 961q-39.05 0-66.525-27.475Q95 906.05 95 867V285q0-39.463 27.475-67.231Q149.95 190 189 190h582q39.463 0 67.231 27.769Q866 245.537 866 285v582q0 39.05-27.769 66.525Q810.463 961 771 961H189Zm0-94h582V285H189v582Zm0-582v582-582Z" /></svg>}
                                         {isEditingCheck === true && idEdit === e.idchecklist ?
                                             <input defaultValue={e.nome} onKeyDown={(event) => handleKeyDownCheck(event, e.idchecklist, e.nome, "edit")} onChange={(e) => setForm(e.target.value)}></input>
@@ -350,7 +379,9 @@ export const Pop_up_ViewTarefa = (props) => {
                                                 </div>
                                                 :
                                                 <>
-                                                    <div className="card_obs">{e.observacao}</div>
+                                                    <div className="card_obs">
+                                                        {e.observacao}
+                                                    </div>
                                                     <div className="edit_delete_obs">
                                                         <span onClick={() => updateDeleteObs(e.idobservacao, "edit")}>Editar</span>
                                                         <span onClick={() => updateDeleteObs(e.idobservacao, "delete")}>Deletar</span>
@@ -364,13 +395,7 @@ export const Pop_up_ViewTarefa = (props) => {
                             :
                             ""
                         }
-
                     </Block_ViewTarefa>
-                    <img className="close" src={close} onClick={() => {
-                        socket.emit('att-list-tarefa', idprojeto);
-                        setIsAddCheck(false);
-                        setTrigger(false);
-                    }} />
                 </Card_Tarefa>
             </div>
         </Container>

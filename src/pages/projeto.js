@@ -4,7 +4,6 @@ import { Container, Section_Buttons, Section_Titulo, Icons, Section_Cards, Card,
 
 import done from '../Assets/done.svg';
 import undo from '../Assets/undo.svg';
-import del from '../Assets/delete.svg';
 import github from '../Assets/Octicons-mark-github.svg';
 import link from '../Assets/link.svg';
 import add from '../Assets/add.svg';
@@ -30,19 +29,32 @@ function Projeto() {
 
     const [trigger, setTrigger] = useState(false);
     const [dataProjeto, setDataProjeto] = useState();
+
     const [tarefa, setTarefa] = useState();
     const [andamento, setAndamento] = useState();
     const [concluido, setConcluido] = useState();
+
     const [type, setType] = useState();
     const [type_tarefa, setType_Tarefa] = useState();
     const [idTarefa, setIdTarefa] = useState();
     const [tarefaData, setTarefaData] = useState();
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
+    
     const urlParams = new URLSearchParams(window.location.search);
     const idprojeto = urlParams.get("id");
     const navigate = useNavigate();
 
     useEffect(() => {
+
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+           
+        };
+
+        window.addEventListener("resize", handleResize);
+
+
         socket?.on('list-tarefa-newData', (data) => {
             setTarefa(data.tarefa);
             setAndamento(data.andamento);
@@ -84,6 +96,10 @@ function Projeto() {
                 })
         }
 
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+
     }, [socket])
 
     const getTarefa = (id) => {
@@ -100,9 +116,9 @@ function Projeto() {
     }
 
     const setStatus = (status) => {
-        try {
+        if(dataProjeto?.status === 'Em andamento'){
             axios.post(`${process.env.REACT_APP_APIPATH}/projeto/projetoChangeStatus/${user?.iduser}`, {
-                status: status,
+                status: 'Concluido',
                 idprojeto: idprojeto
             })
                 .then((res) => {
@@ -112,8 +128,18 @@ function Projeto() {
                     // manipula erros da requisição
                     console.error(error);
                 })
-        } catch (err) {
-            console.log(err);
+        }else{
+            axios.post(`${process.env.REACT_APP_APIPATH}/projeto/projetoChangeStatus/${user?.iduser}`, {
+                status: 'Em andamento',
+                idprojeto: idprojeto
+            })
+                .then((res) => {
+                    socket.emit('att-list-projeto', idprojeto);
+                })
+                .catch(function (error) {
+                    // manipula erros da requisição
+                    console.error(error);
+                })
         }
     }
 
@@ -145,6 +171,12 @@ function Projeto() {
         }
     }
 
+    const StatusButton = ({ status, onClick, image }) => (
+        <button onClick={onClick} style={{ backgroundColor: status === 'Em andamento' ? '#2ECD15' : '#147EFB' }}>
+            <img src={image} alt={status} />
+        </button>
+    );
+
     return (
         <DefaultLayout>
             {trigger && type === "view_tarefa" ? <Pop_up_ViewTarefa setTrigger={setTrigger} idprojeto={idprojeto} idtarefa={idTarefa} tarefaData={tarefaData} /> : ""}
@@ -153,15 +185,13 @@ function Projeto() {
             <Container>
                 <Section_Titulo>
                     <div className="container_titulo">
-                        <p>{dataProjeto?.nome}</p>
+                        <p>{windowWidth >= 800 ? dataProjeto?.nome.slice(0, 50) + "..." : dataProjeto?.nome.slice(0, 10) + "..."}</p>
                         <Icons>
-                        {dataProjeto?.status === "Em andamento" ? <button onClick={() => setStatus("Concluido")} style={{backgroundColor: "#2ECD15"}}>
-                            <img src={done} />
-                        </button>
-                            :
-                            <button onClick={() => setStatus("Em andamento")} style={{backgroundColor: "#147EFB"}}>
-                                <img src={undo} />
-                            </button>}
+                            <StatusButton
+                                status={dataProjeto?.status}
+                                onClick={setStatus}
+                                image={dataProjeto?.status === 'Em andamento' ? done : undo}
+                            />
                             {dataProjeto?.github ? <a href={dataProjeto?.github} target="_blank"><img src={github} /></a> : <img src={github} />}
                             {dataProjeto?.site ? <a href={dataProjeto?.site} target="_blank"><img src={link} onClick={() => console.log("Clicou imagem")} /></a> : <img src={link} onClick={() => console.log("Clicou imagem")} />}
                             <svg onClick={() => {

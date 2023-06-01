@@ -35,6 +35,11 @@ export const Container = styled.div`
         height: 2px;
     }
    
+   @media screen and (max-width: 560px){
+        .absolute{
+            width: 90%;
+        }
+   }
 `
 
 export const Card = styled.div`
@@ -52,13 +57,23 @@ export const Card = styled.div`
 
     z-index: 999;
 
+    @media screen and (max-width: 560px){
+        width: 90%;
+    }
+
+
+    .titulo_cont{
+        width: 100%;
+        position: relative;
+    }
+
     img{
         width: 38px;
         height: 38px;
 
         position: absolute;
 
-        left: 488px;
+        right: 10px;
         top: 15px;
 
         cursor: pointer;
@@ -140,6 +155,16 @@ export const Card_Add = styled.div`
     border-radius: 5px;
 
     position: relative;
+    
+    @media screen and (max-width: 560px){
+        width: 90%;
+    }
+
+
+    .titulo_cont{
+        width: 100%;
+        position: relative;
+    }
 
     .close{
         width: 38px;
@@ -147,11 +172,12 @@ export const Card_Add = styled.div`
 
         position: absolute;
 
-        left: 500px;
+        right: 10px;
         top: 15px;
 
         cursor: pointer;
     }
+
 
     .close:hover{
         opacity: 0.8;
@@ -388,6 +414,28 @@ export const Card_Tarefa = styled.div`
     position: relative;
     gap: 20px;
 
+    @media screen and (max-width: 560px){
+        width: 90%;
+    }
+
+
+    .titulo_cont{
+        width: 100%;
+        position: relative;
+    }
+
+    .close{
+        width: 38px;
+        height: 38px;
+
+        position: absolute;
+
+        right: 10px;
+        top: 15px;
+
+        cursor: pointer;
+    }
+
     .input{
         background: #FFFFFF;
         border-radius: 5px;
@@ -397,17 +445,6 @@ export const Card_Tarefa = styled.div`
         margin-top: 20px;
     }
 
-    .close{
-        width: 38px;
-        height: 38px;
-
-        position: absolute;
-
-        left: 500px;
-        top: 15px;
-
-        cursor: pointer;
-    }
 
     .close:hover{
         opacity: 0.8;
@@ -661,102 +698,87 @@ export const Block_Coment = styled.div`
 `
 
 export const ContainerObservacao = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+  gap: 10px;
+  color: white;
+
+  box-sizing: border-box;
+
+  img {
+    width: 35px;
+    height: 35px;
+  }
+
+  .block_right {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 5px 0px 0px;
+    gap: 10px;
+    box-sizing: border-box;
+
+    .editing {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      div {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      span:hover {
+        opacity: 0.8;
+      }
+
+      span {
+        cursor: pointer;
+      }
+    }
+
+    textarea {
+      width: calc(100% - 16px);
+      padding: 10px;
+      resize: none;
+      border-radius: 5px;
+    }
+
+    .card_obs {
+      padding: 5px 10px;
+      background-color: white;
+      width: 100%;
+      border-radius: 5px;
+      color: black;
+      white-space: pre-line;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      box-sizing: border-box;
+    }
+  }
+
+  .edit_delete_obs {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
+    padding: 0px;
     gap: 10px;
 
-    color: white;
-
-    img{
-        width: 35px;
-        height: 35px;
+    span {
+      font-size: 15px;
+      cursor: pointer;
     }
 
-    .card_obs{
-        padding: 5px 10px;
-        background-color: white;
-        width: calc(100% - 20px);
-        border-radius: 5px;
-        color: black;
-        white-space: pre-line;
-
+    span:hover {
+      opacity: 0.8;
     }
-
-    .block_right{
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 5px 0px 0px;
-        gap: 10px;
-
-        .editing{
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-
-            div{
-                display: flex;
-                gap: 10px;
-                align-items: center;
-            }
-
-            span:hover{
-                opacity: 0.8;
-            }
-
-            span{
-                cursor: pointer;
-            }
-        }
-
-        textarea{
-            width: calc(100% - 16px);
-            padding-left: 10px;
-            padding-top: 5px;
-            resize: none;
-            border-radius: 5px;
-        }
-
-        button{
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            align-items: center;
-            border: none;
-
-            width: 82px;
-            height: 25px;
-
-            background: #147EFB;
-            border-radius: 5px;
-
-            color: white;
-            cursor: pointer;
-        }
-    }
-
-    .edit_delete_obs{
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        padding: 0px;
-        gap: 10px;
-
-        span{
-            font-size: 15px;
-            cursor: pointer;
-        }
-
-        span:hover{
-            opacity: 0.8;
-        }
-    }
-
-
-`
+  }
+`;
 
 export const Block_Settings = styled.div`
     

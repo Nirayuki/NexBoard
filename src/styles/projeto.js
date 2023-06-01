@@ -103,7 +103,6 @@ export const Section_Titulo = styled.section`
 export const Icons = styled.div`
     width: 190px;
     display: flex;
-    flex-direction: row;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
@@ -198,9 +197,10 @@ export const Block_Tarefa = styled.div`
     flex-direction: column;
     padding-right: 15px;
     gap: 10px;
-    max-height: 320px;
+    max-height: 44vh;
     overflow-y: auto;
     overflow-x: hidden;
+
 
     &::-webkit-scrollbar{
         border: none;

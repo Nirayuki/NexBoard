@@ -6,6 +6,10 @@ export const Container = styled.div`
     align-items: flex-start;
     padding: 100px 100px 0px 100px;
     gap: 10px;
+
+    @media screen and (max-width: 570px) {
+        padding: 100px 0px 0px 15px;
+    }
 `
 
 export const Section = styled.section`

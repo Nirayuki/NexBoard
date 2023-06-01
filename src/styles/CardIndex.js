@@ -17,6 +17,10 @@ export const Card = styled.div`
 
     position: relative;
 
+    @media screen and (max-width: 450px){
+        width: 300px;
+    }
+
     .titulo{
         font-size: 24px;
         color: white;

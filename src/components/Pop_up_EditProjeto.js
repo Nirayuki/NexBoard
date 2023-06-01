@@ -74,7 +74,17 @@ export const Pop_up_EditProjeto = (props) => {
         <Container>
             <div className="absolute">
                 <Card>
-                    <p className="titulo">Configurações</p>
+                    <div className="titulo_cont">
+                        <p className="titulo">Configurações</p>
+                        <img src={close} onClick={() => {
+                            setTrigger(false);
+                            setFormSettings(initialValues);
+                            setError("");
+                            setHasError(false);
+                            setDel("");
+                        }} />
+                    </div>
+
                     {hasError ? <Error><p>{error}</p></Error> : ""}
                     <Block_Settings>
                         <div>
@@ -96,13 +106,6 @@ export const Pop_up_EditProjeto = (props) => {
                         </div>
                     </Block_Settings>
                     <Button onClick={onSubmitSettings}>Salvar</Button>
-                    <img src={close} onClick={() => {
-                        setTrigger(false);
-                        setFormSettings(initialValues);
-                        setError("");
-                        setHasError(false);
-                        setDel("");
-                    }} />
                 </Card>
             </div>
         </Container>

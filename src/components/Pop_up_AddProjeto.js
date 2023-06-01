@@ -44,11 +44,14 @@ export const Pop_up_AddProjeto = (props) => {
         <Container>
             <div className="absolute">
                 <Card>
-                    <p className="titulo">Nome do Projeto</p>
+                    <div className="titulo_cont">
+                        <p className="titulo">Nome do Projeto</p>
+                        <img src={close} onClick={() => setTrigger(false)} />
+                    </div>
                     {hasError ? <Error><p>{error}</p></Error> : ""}
                     <input type="text" onChange={(e) => setForm(e.target.value)} />
                     <Button onClick={onSubmit}>Adicionar</Button>
-                    <img src={close} onClick={() => setTrigger(false)} />
+
                 </Card>
             </div>
         </Container>

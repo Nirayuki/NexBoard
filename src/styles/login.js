@@ -7,11 +7,13 @@ export const Container = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-
+    
     .persona{
         width: 107px;
         height: 107px;
     }
+
+    
 
 `
 
@@ -27,6 +29,7 @@ export const Card = styled.div`
 
     background: #2C2C2C;
     border-radius: 5px;
+
 
 
 `

@@ -90,7 +90,19 @@ export const Pop_up_AddTarefa = (props) => {
         <Container>
             <div className="absolute">
                 <Card_Add>
-                    <p className="titulo">Adicionar Tarefa</p>
+                    <div className="titulo_cont">
+                        <p className="titulo">Adicionar Tarefa</p>
+                        <img className="close" src={close} onClick={() => {
+                            setTrigger(false);
+                            setFormCheck([]);
+                            setForm("");
+                            setHasError(false);
+                            setIsAddCheck(false);
+                            setDateOpen(false);
+                            setFormDate("");
+                        }} />
+                    </div>
+
                     {hasError ? <Error><p>{error}</p></Error> : ""}
                     <Block_Form>
                         <ScrollableFeed className="scroll">
@@ -156,15 +168,6 @@ export const Pop_up_AddTarefa = (props) => {
                     <div>
                         <Button onClick={onSubmitCheck}>Criar</Button>
                     </div>
-                    <img className="close" src={close} onClick={() => {
-                        setTrigger(false);
-                        setFormCheck([]);
-                        setForm("");
-                        setHasError(false);
-                        setIsAddCheck(false);
-                        setDateOpen(false);
-                        setFormDate("");
-                    }} />
                 </Card_Add>
             </div>
         </Container>
