@@ -1,5 +1,5 @@
 <p align="center">
-   <img src="https://imgur.com/6WJv1S9" width="600"/>
+   <img src="./nexboardbg.png" width="600"/>
 </p>
 
 <p align="center">
@@ -36,7 +36,7 @@
 
 # 👀 Demo Website
 
-👉  Demo: https://onigirihardcore.com.br/
+👉  Demo: https://nexboard.netlify.app/
 
 # 💻 Technologies
 
