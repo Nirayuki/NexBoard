@@ -1,6 +1,8 @@
 import React from "react";
 import { Header } from "../styles/DefaultLayout/header";
-import logo from '../assets/nexboard.png';
+import logo_blue from '../assets/n-nexboard.png';
+import logo_white from '../assets/n-white.png';
+import { Link } from "react-router-dom";
 
 type Props = {
     children: string | React.JSX.Element | React.JSX.Element[]
@@ -11,18 +13,20 @@ export const DefaultLayout = ({children} : Props) => {
         <>
             <Header>
                 <nav className="container">
-                    <div className="logo">
-                        <img src={logo}/>
-                    </div>
+                    <Link to="/" className="logo">
+                        <img src={logo_white}/>
+                    </Link>
                     <div className="nav">
-                        <a href="#">Inicio</a>
-                        <a href="#">Projetos</a>
+                        <Link to="/">Inicio</Link>
+                        <a href="https://github.com/Nirayuki?tab=repositories" target="_blank">Projetos</a>
+                        <a href="https://nirayuki.netlify.app/#contato" target="_blank">Contato</a>
+                    </div>
+                    <div className="login">
+                        <button>Login</button>
                     </div>
                 </nav>
             </Header>
-            <div>
-                {children}
-            </div>
+            {children}
         </>
     )
 }
